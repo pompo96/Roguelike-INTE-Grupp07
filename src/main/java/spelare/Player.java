@@ -50,7 +50,7 @@ public class Player {
         return questProgress.containsKey(questID);
     }
     public boolean isQuestComplete(String questID){
-        return questProgress.get(questID);
+        return questProgress.getOrDefault(questID, false);
     }
 
     public int getMaxLife() {
