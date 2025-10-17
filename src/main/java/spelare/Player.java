@@ -6,6 +6,9 @@ import utrustning.Item;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
     private int maxLife;
     private int currentLife;
@@ -18,6 +21,8 @@ public class Player {
     static final int DEFAULT_ATTACK_POWER = 10;
     Map<String, Item> items;
     Map<String, Boolean> questProgress;
+    private List<Quest> activeQuests;
+    private boolean questLogOpen;
 
     public Player(Race race) {
         this(race, emptyItemList());
@@ -33,6 +38,8 @@ public class Player {
         items = new HashMap<>();
         items.putAll(defaultItems);
         questProgress = new HashMap<>();
+        this.activeQuests = new ArrayList<>();
+        this.questLogOpen = false;
     }
 
     private static Map<String, Item> emptyItemList() {
@@ -103,7 +110,7 @@ public class Player {
 
     public void equipWeapon(Item item) {
         items.put(item.getName(), item);
-        updateAttackPower(item.getDamageModifier());
+        //updateAttackPower(item.getDamageModifier());
     }
     public void equipChestpiece(Item item){
         items.put(item.getName(), item);
@@ -147,4 +154,52 @@ public class Player {
 //        return items.get("weapon").getWeaponDamage() + finalAttackPower;
 //    }
 
+
+public void openQuestLog() {
+    this.questLogOpen = true;
 }
+
+    public void closeQuestLog() {
+        this.questLogOpen = false;
+    }
+
+    public boolean isQuestLogOpen() {
+        return this.questLogOpen;
+    }
+
+    public void acceptQuest(Quest quest) {
+        if (quest != null && !activeQuests.contains(quest)) {
+            activeQuests.add(quest);
+        }
+    }
+
+    public void abandonQuest(Quest quest) {
+        activeQuests.remove(quest);
+    }
+
+    public List<Quest> getActiveQuests() {
+        return new ArrayList<>(activeQuests);
+    }
+
+    public Quest getQuest(String questID) {
+        for (Quest quest : activeQuests) {
+            if (quest.getID().equals(questID)) {
+                return quest;
+            }
+        }
+        return null;
+    }
+
+    public int getQuestCount() {
+        return activeQuests.size();
+    }
+
+
+    public interface Quest {
+        String getID();
+        String getName();
+        String getDescription();
+    }
+}
+
+

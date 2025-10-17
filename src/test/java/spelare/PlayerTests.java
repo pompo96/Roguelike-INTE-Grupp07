@@ -6,6 +6,7 @@ import utrustning.Item;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,6 +30,8 @@ public class PlayerTests {
     Item mockItemWeapon;
     Item mockItemChestpiece;
     Item mockItemBoots;
+    Player.Quest mockQuest1;
+    Player.Quest mockQuest2;
     //Quest questList;
 
     @BeforeEach
@@ -57,6 +60,16 @@ public class PlayerTests {
         when(mockRace.getAttackPowerModifier()).thenReturn(5);
         when(mockRace.getName()).thenReturn("human");
 
+        mockQuest1 = mock(Player.Quest.class);
+        when(mockQuest1.getID()).thenReturn("DungeonBeat");
+        when(mockQuest1.getName()).thenReturn("Beat the Dungeon");
+        when(mockQuest1.getDescription()).thenReturn("Defeat all enemies in the dungeon");
+
+        mockQuest2 = mock(Player.Quest.class);
+        when(mockQuest2.getID()).thenReturn("LostAndFound");
+        when(mockQuest2.getName()).thenReturn("Find the Lost Artifact");
+        when(mockQuest2.getDescription()).thenReturn("Search for the artifact in the forest");
+
         //when(questList.getQuests()).thenReturn([("DungeonBeat", true), ("LostAndFound", false),("Tutorial", true)]);
 
         defaultPlayer = new Player(mockRace);
@@ -82,7 +95,7 @@ public class PlayerTests {
         int defaultLife = Player.DEFAULT_LIFE + mockRace.getLifeModifier();
         assertEquals(defaultLife, defaultPlayer.getCurrentLife());
     }
-    
+
     @Test
     public void updateCurrentLife_updatesCurrentLife(){
         int defaultLife = Player.DEFAULT_LIFE + mockRace.getLifeModifier();
@@ -90,7 +103,7 @@ public class PlayerTests {
         defaultPlayer.updateCurrentLife(lifeAdjustment);
         assertEquals(defaultLife+lifeAdjustment, defaultPlayer.getCurrentLife());
     }
-    
+
     @Test
     public void updateCurrentLife_limitedByMaxLife(){
         defaultPlayer.updateCurrentLife(10);
@@ -236,7 +249,7 @@ public class PlayerTests {
         assertEquals(player.getItems().get("chestpiece"), items.get("chestpiece"), "Det är inte en chestpiece");
         assertEquals(player.getItems().get("boot"), items.get("boot"), "Det är int en boot");
     }
-    
+
     @Test
     public void equipItem_properlyEquipsItem(){
         defaultPlayer.equipItem(mockItemWeapon);
@@ -271,6 +284,86 @@ public class PlayerTests {
 
         assertEquals(newMovementSpeed, defaultPlayer.getMovementSpeed());
     }
+
+    @Test
+    public void questLog_startsClosedByDefault() {
+        assertFalse(defaultPlayer.isQuestLogOpen(), "QuestLog borde vara stängd från början");
+    }
+
+    @Test
+    public void openQuestLog_opensTheLog() {
+        defaultPlayer.openQuestLog();
+        assertTrue(defaultPlayer.isQuestLogOpen(), "QuestLog borde vara öppen");
+    }
+
+    @Test
+    public void closeQuestLog_closesTheLog() {
+        defaultPlayer.openQuestLog();
+        defaultPlayer.closeQuestLog();
+        assertFalse(defaultPlayer.isQuestLogOpen(), "QuestLog borde vara stängd");
+    }
+
+    @Test
+    public void acceptQuest_addsQuestToLog() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        assertEquals(1, defaultPlayer.getQuestCount(), "QuestLog borde innehålla 1 quest");
+    }
+
+    @Test
+    public void acceptMultipleQuests_addsAllQuests() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        defaultPlayer.acceptQuest(mockQuest2);
+        assertEquals(2, defaultPlayer.getQuestCount(), "QuestLog borde innehålla 2 quests");
+    }
+
+    @Test
+    public void acceptDuplicateQuest_doesNotAddDuplicate() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        defaultPlayer.acceptQuest(mockQuest1);
+        assertEquals(1, defaultPlayer.getQuestCount(), "QuestLog borde inte ha dubbletter");
+    }
+
+    @Test
+    public void getActiveQuests_returnsAllQuests() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        defaultPlayer.acceptQuest(mockQuest2);
+        List<Player.Quest> quests = defaultPlayer.getActiveQuests();
+        assertEquals(2, quests.size(), "Borde returnera 2 quests");
+    }
+
+    @Test
+    public void getQuest_returnsQuestByID() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        Player.Quest foundQuest = defaultPlayer.getQuest("DungeonBeat");
+        assertEquals(mockQuest1, foundQuest, "Borde hitta rätt quest");
+    }
+
+    @Test
+    public void getQuest_returnsNullIfNotFound() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        Player.Quest foundQuest = defaultPlayer.getQuest("NonExistent");
+        assertNull(foundQuest, "Borde returnera null för icke existerande quest");
+    }
+
+    @Test
+    public void abandonQuest_removesQuestFromLog() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        defaultPlayer.acceptQuest(mockQuest2);
+        defaultPlayer.abandonQuest(mockQuest1);
+        assertEquals(1, defaultPlayer.getQuestCount(), "QuestLog borde innehålla 1 quest efter abandon");
+    }
+
+    @Test
+    public void abandonQuest_correctQuestRemoved() {
+        defaultPlayer.acceptQuest(mockQuest1);
+        defaultPlayer.acceptQuest(mockQuest2);
+        defaultPlayer.abandonQuest(mockQuest1);
+
+        Player.Quest remaining = defaultPlayer.getQuest("LostAndFound");
+        assertEquals(mockQuest2, remaining, "LostAndFound borde fortfarande vara i loggen");
+    }
+
+
 
     // Questlog list(questObjects) // Yousef
 
