@@ -1,4 +1,4 @@
-package org.example;
+package utrustning;
 
 public class Utrustning {
 
