@@ -14,6 +14,7 @@ public class Main {
             System.out.println("i = " + i);
             //This is a comment to see if commiting changes works
         }
-        System.out.println("Apparently comments are not viewable on github. let's see if this commit works instead");
+        System.out.println("Apparently comments are not viewable on github. let's see if this commit works instead.");
+        //On my third attempt now, it looks like I also gotta push, if you see this it means it worked
     }
 }
