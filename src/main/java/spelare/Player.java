@@ -43,8 +43,15 @@ public class Player {
         return emptyItemMap;
     }
 
+    public void setQuest(Map<String, Boolean> questProgress){
+        this.questProgress = questProgress;
+    }
+
     public void questWasCompleted(String questID){
         questProgress.put(questID, true);
+    }
+    public void questWasStarted(String questID){
+        questProgress.put(questID, false);
     }
     public boolean isQuestStarted(String questID){
         return questProgress.containsKey(questID);

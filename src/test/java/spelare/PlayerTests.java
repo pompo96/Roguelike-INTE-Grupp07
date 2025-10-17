@@ -2,6 +2,7 @@ package spelare;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import race.Race;
+import story.Quest;
 import utrustning.Item;
 
 import java.util.HashMap;
@@ -30,14 +31,14 @@ public class PlayerTests {
     Item mockItemWeapon;
     Item mockItemChestpiece;
     Item mockItemBoots;
-    //Quest questList;
+    Quest mockQuestList;
 
     @BeforeEach
     public void initializePlayer(){
 
 
         //Skapa en quest interface för att använda mock?
-        //mock questList = mock(Quest.class);
+        mockQuestList = mock(Quest.class);
 
         mockRace = mock(Race.class);
         mockItemWeapon = mock(Item.class);
@@ -58,7 +59,7 @@ public class PlayerTests {
         when(mockRace.getAttackPowerModifier()).thenReturn(5);
         when(mockRace.getName()).thenReturn("human");
 
-        //when(questList.getQuests()).thenReturn([("DungeonBeat", true), ("LostAndFound", false),("Tutorial", true)]);
+        when(mockQuestList.getQuestID()).thenReturn("MockQuest");
 
         defaultPlayer = new Player(mockRace);
     }
@@ -165,33 +166,47 @@ public class PlayerTests {
     }
     // Story progress map (questname -> completed(boolean))
 
+
+    @Test
+    public void questCompletion
+
     @Test
     public void completedQuest_returnsTrue(){
-        boolean result = true; //defaultPlayer.isQuestCompleted(questID);
-        assertEquals(true, result, "Quest has not been completed.");
+        String questID = "LostAndFound";
+        defaultPlayer.questWasCompleted(questID);
+        boolean result = defaultPlayer.isQuestComplete(questID);
+        assertEquals(true, result, "Quest should be completed.");
     }
 
     @Test
     public void completedQuest_returnsFalse(){
-        boolean result = false; //defaultPlayer.isQuestCompleted(questID);
-        assertEquals(false, result, "Quest has been completed.");
+        String questID = "NotAKnownQuest";
+        boolean result = defaultPlayer.isQuestComplete(questID);
+        assertEquals(false, result, "Quest should not be completed.");
     }
 
     @Test
     public void questIsNotStarted(){
-        boolean result = false;//defaultPlayer.isQuestStarted(questID);
-        assertEquals(false, result, "Quest has started");
+        String questID = "NewQuest";
+        boolean result = defaultPlayer.isQuestStarted(questID);
+        assertEquals(false, result, "Quest should not be started");
     }
 
     @Test
     public void questIsStarted(){
-        boolean result = true; //defaultPlayer.isQuestStarted(questID);
-        assertEquals(true, result, "Quest has not started");
+        String questID = "DungeonBeat2";
+        defaultPlayer.questWasStarted(questID);
+        boolean result = defaultPlayer.isQuestStarted(questID);
+        assertEquals(true, result, "Quest should be started");
     }
 
     @Test
     public void addQuest(){
+        String questID = "FindMyShoe";
+        defaultPlayer.questWasStarted(questID);
 
+        assertEquals(true, defaultPlayer.isQuestStarted(questID));
+        assertEquals(false, defaultPlayer.isQuestComplete(questID));
     }
 
     // Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
