@@ -8,7 +8,7 @@ public class Utrustning {
         this.itemExists = true;
     }
 
-    public Object getValue() {
+    public boolean getValue() {
         return itemExists;
     }
 }
