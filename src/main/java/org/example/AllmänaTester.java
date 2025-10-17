@@ -12,4 +12,8 @@ public class AllmänaTester {
         assertEquals(true, ut.getValue());
     }
 
+    @Test
+    public void weaponHadIDNameAndStats(){
+    }
+
 }
