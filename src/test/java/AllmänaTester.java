@@ -13,10 +13,12 @@ public class AllmänaTester {
 
     @Test
     public void weaponHadIDNameAndStats(){
-        Weapon sword = new Weapon(1, "Flamesword", 14);
+        Utrustning sword = new Utrustning(1, "Flamesword", 14);
+        assertEquals(true, sword.getValue());
         assertEquals(1, sword.getID());
         assertEquals("Flamesword", sword.getName());
         assertEquals(14, sword.getDamage());
+        assertEquals("weapon", sword.getType());
     }
 
 }
