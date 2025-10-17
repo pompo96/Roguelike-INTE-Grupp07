@@ -4,7 +4,8 @@ public interface Item {
     int getLifeModifier();
 
     int getMovementModifier();
-    int getDamageModifier();
+    int getWeaponDamage();
+
     String getName();
 
 

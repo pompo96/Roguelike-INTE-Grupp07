@@ -7,9 +7,8 @@ import utrustning.Item;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Spelare attribut
@@ -45,7 +44,7 @@ public class PlayerTests {
         mockItemBoots = mock(Item.class);
 
         when(mockItemWeapon.getName()).thenReturn("weapon");
-        when(mockItemWeapon.getDamageModifier()).thenReturn(15);
+        when(mockItemWeapon.getWeaponDamage()).thenReturn(15);
 
         when(mockItemChestpiece.getName()).thenReturn("chestpiece");
         when(mockItemChestpiece.getLifeModifier()).thenReturn(10);
@@ -130,29 +129,51 @@ public class PlayerTests {
     @Test
     public void defaultPlayer_hasDefaultAttackPower(){
         int expectedAttackPower = Player.DEFAULT_ATTACK_POWER + mockRace.getAttackPowerModifier();
-        assertEquals(expectedAttackPower, defaultPlayer.getAttackPower());
+        assertEquals(expectedAttackPower, defaultPlayer.getBaseAttackPower());
     }
 
     @Test
-    public void updateAttackPower_increasesAttackPower(){
+    public void updateAttackPower_increasesBaseAttackPower(){
         int attackAdjustment = 20;
         int defaultAttack = Player.DEFAULT_ATTACK_POWER + mockRace.getAttackPowerModifier();
-        defaultPlayer.updateAttackPower(attackAdjustment);
-        assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getAttackPower());
+        defaultPlayer.updateBaseAttackPower(attackAdjustment);
+        assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getBaseAttackPower());
     }
     @Test
-    public void updateAttackPower_decreasesAttackPower(){
-        double attackAdjustment = 0.5;
+    public void updateBaseAttackPower_decreasesBaseAttackPower(){
+        int attackAdjustment = 2;
         int defaultAttack = Player.DEFAULT_ATTACK_POWER + mockRace.getAttackPowerModifier();
-        defaultPlayer.updateAttackPowerModifier(attackAdjustment);
-        assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getAttackPower());
+        defaultPlayer.updateBaseAttackPower(attackAdjustment);
+        assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getBaseAttackPower());
     }
 
     @Test
-    public void updateAttackPower_cantGoBelowZero(){
-        int currentAttackPower = defaultPlayer.getAttackPower();
-        defaultPlayer.updateAttackPower(-currentAttackPower - 10);
-        assertEquals(0, defaultPlayer.getAttackPower());
+    public void updateBaseAttackPower_cantGoBelowZero(){
+        int currentAttackPower = defaultPlayer.getBaseAttackPower();
+        defaultPlayer.updateBaseAttackPower(-currentAttackPower - 10);
+        assertEquals(0, defaultPlayer.getBaseAttackPower());
+    }
+
+    @Test
+    public void newDefaultCharacter_hasZeroAttackEffectModifier()
+    {
+        assertEquals(0, defaultPlayer.getAttackPowerEffectModifier());
+    }
+
+    @Test
+    public void updatingAttackEffectModifier_setsAttackEffectModifier(){
+        int effectValue = 2;
+        defaultPlayer.updateAttackPowerEffectModifier(effectValue);
+        assertEquals(effectValue, defaultPlayer.getAttackPowerEffectModifier());
+    }
+
+    @Test
+    public  void updatingAttackEffectModifier_overridesPreviousValue(){
+        int firstEffectValue = 3;
+        int secondEffectValue = -4;
+        defaultPlayer.updateAttackPowerEffectModifier(firstEffectValue);
+        defaultPlayer.updateAttackPowerEffectModifier(secondEffectValue);
+        assertEquals(secondEffectValue, defaultPlayer.getAttackPowerEffectModifier());
     }
 
     // Race (Race objekt)
@@ -168,25 +189,25 @@ public class PlayerTests {
     @Test
     public void completedQuest_returnsTrue(){
         boolean result = true; //defaultPlayer.isQuestCompleted(questID);
-        assertEquals(true, result, "Quest has not been completed.");
+        assertTrue(result, "Quest has not been completed.");
     }
 
     @Test
     public void completedQuest_returnsFalse(){
         boolean result = false; //defaultPlayer.isQuestCompleted(questID);
-        assertEquals(false, result, "Quest has been completed.");
+        assertFalse(result, "Quest has been completed.");
     }
 
     @Test
     public void questIsNotStarted(){
         boolean result = false;//defaultPlayer.isQuestStarted(questID);
-        assertEquals(false, result, "Quest has started");
+        assertFalse(result, "Quest has started");
     }
 
     @Test
     public void questIsStarted(){
         boolean result = true; //defaultPlayer.isQuestStarted(questID);
-        assertEquals(true, result, "Quest has not started");
+        assertTrue(result, "Quest has not started");
     }
 
     @Test
@@ -196,10 +217,11 @@ public class PlayerTests {
 
     // Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
     //ska ta en map där vapen,armour,boots är tom
-    @Test
-    public void defaultPlayerHasNoItems(){
-        assertEquals("", defaultPlayer.getItems(), "Player har items");
-    }
+    // todo player ska ha en default item list
+//    @Test
+//    public void defaultPlayerHasNoItems(){
+//        assertEquals("", defaultPlayer.getItems(), "Player har items");
+//    }
 
     @Test
     public void playerWithStarterItems_hasItems(){
@@ -224,11 +246,11 @@ public class PlayerTests {
 
     //equipitems test + player metod se till att life/movement speed updateras korrekt
     @Test
-    public void equippingWeapon_updatesAttackPower(){
+    public void equippingWeapon_updatesWeapon(){
         defaultPlayer.equipItem(mockItemWeapon);
-        int updatedAttack = mockItemWeapon.getDamageModifier();
-
-        assertEquals(updatedAttack, defaultPlayer.getAttackPower());
+        Map<String, Item> items = defaultPlayer.getItems();
+        Item weapon = items.get(mockItemWeapon.getName());
+        assertEquals(weapon, mockItemWeapon);
     }
 
     @Test

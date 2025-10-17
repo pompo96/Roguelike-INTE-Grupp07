@@ -10,12 +10,12 @@ public class Player {
     private int maxLife;
     private int currentLife;
     private int movementSpeed;
-    private int attackPower;
-    private double attackPowerModifier;
+    private int baseAttackPower;
+    private int attackPowerEffectModifier;
     final Race race;
     static final int DEFAULT_LIFE = 100;
     static final int DEFAULT_MOVEMENT_SPEED = 10;
-    static final int DEFAULT_ATTACK_POWER = 0;
+    static final int DEFAULT_ATTACK_POWER = 10;
     Map<String, Item> items;
     Map<String, Boolean> questProgress;
 
@@ -28,8 +28,8 @@ public class Player {
         this.maxLife = DEFAULT_LIFE + race.getLifeModifier();
         this.currentLife = this.maxLife;
         this.movementSpeed = DEFAULT_MOVEMENT_SPEED + race.getMovementModifier();
-        this.attackPower = DEFAULT_ATTACK_POWER + race.getAttackPowerModifier();
-        this.attackPowerModifier = 1;
+        this.baseAttackPower = DEFAULT_ATTACK_POWER + race.getAttackPowerModifier();
+        this.attackPowerEffectModifier = 0;
         items = new HashMap<>();
         items.putAll(defaultItems);
         questProgress = new HashMap<>();
@@ -124,14 +124,27 @@ public class Player {
         if (this.movementSpeed < 0) this.movementSpeed = 0;
     }
 
-    public int getAttackPower() {
-        return (int) (attackPower*attackPowerModifier);
+
+    public int getBaseAttackPower() {
+        return this.baseAttackPower;
     }
 
-    public void updateAttackPower(int weaponAttackPower) {
-        this.attackPower = weaponAttackPower;
+    public int getAttackPowerEffectModifier(){
+        return this.attackPowerEffectModifier;
     }
-    public void updateAttackPowerModifier(double damageMultiplier) {
-        this.attackPowerModifier  *= damageMultiplier;
+    public void updateBaseAttackPower(int adjustment) {
+        this.baseAttackPower += adjustment;
+        if(this.baseAttackPower < 0) this.baseAttackPower = 0;
     }
+    public void updateAttackPowerEffectModifier(int effectModifier) {
+        this.attackPowerEffectModifier  = effectModifier;
+    }
+
+//    public int calculateDamage(){
+//        if (items.get("weapon") == null) return 0;
+//        int finalAttackPower = baseAttackPower + attackPowerEffectModifier;
+//        if (finalAttackPower < 1) finalAttackPower = 1;
+//        return items.get("weapon").getWeaponDamage() + finalAttackPower;
+//    }
+
 }
