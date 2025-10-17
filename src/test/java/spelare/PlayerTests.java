@@ -30,6 +30,7 @@ public class PlayerTests {
     Item mockItemWeapon;
     Item mockItemChestpiece;
     Item mockItemBoots;
+    //Quest questList;
 
     @BeforeEach
     public void initializePlayer(){
@@ -57,7 +58,7 @@ public class PlayerTests {
         when(mockRace.getAttackPowerModifier()).thenReturn(5);
         when(mockRace.getName()).thenReturn("human");
 
-        //when(questList.getQuests()).thenReturn([("DungeonBeat", true), ("", false),("", true)]);
+        //when(questList.getQuests()).thenReturn([("DungeonBeat", true), ("LostAndFound", false),("Tutorial", true)]);
 
         defaultPlayer = new Player(mockRace);
     }
@@ -124,7 +125,7 @@ public class PlayerTests {
         defaultPlayer.updateMovementSpeed(speedAdjustment);
 
         assertEquals(defaultSpeed + speedAdjustment, defaultPlayer.getMovementSpeed());
-    }
+    }    //GPT end
 
     @Test
     public void defaultPlayer_hasDefaultAttackPower(){
@@ -146,13 +147,13 @@ public class PlayerTests {
         defaultPlayer.updateAttackPowerModifier(attackAdjustment);
         assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getAttackPower());
     }
+
     @Test
     public void updateAttackPower_cantGoBelowZero(){
         int currentAttackPower = defaultPlayer.getAttackPower();
         defaultPlayer.updateAttackPower(-currentAttackPower - 10);
         assertEquals(0, defaultPlayer.getAttackPower());
     }
-    //GPT end
 
     // Race (Race objekt)
     // getter for race
@@ -199,6 +200,7 @@ public class PlayerTests {
     public void defaultPlayerHasNoItems(){
         assertEquals("", defaultPlayer.getItems(), "Player har items");
     }
+
     @Test
     public void playerWithStarterItems_hasItems(){
         Map<String, Item> items = new HashMap<>();

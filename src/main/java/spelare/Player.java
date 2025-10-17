@@ -125,7 +125,7 @@ public class Player {
     }
 
     public int getAttackPower() {
-        return this.attackPower;
+        return (int) (attackPower*attackPowerModifier);
     }
 
     public void updateAttackPower(int weaponAttackPower) {
@@ -133,8 +133,5 @@ public class Player {
     }
     public void updateAttackPowerModifier(double damageMultiplier) {
         this.attackPowerModifier  *= damageMultiplier;
-    }
-    public int calculateAttackPower(){
-        return (int) (attackPower*attackPowerModifier);
     }
 }
