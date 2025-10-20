@@ -1,4 +1,4 @@
-package magi;
+package magic;
 
 public class FireSpell implements Magic{
     private MagicInformation info = new MagicInformation();

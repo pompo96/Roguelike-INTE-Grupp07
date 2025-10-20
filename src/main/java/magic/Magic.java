@@ -1,4 +1,4 @@
-package magi;
+package magic;
 
 public interface Magic {
     String getMagicType();
