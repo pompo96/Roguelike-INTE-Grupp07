@@ -3,7 +3,7 @@ package magic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import race.Race;
-import utrustning.Item;
+import equipment.Item;
 
 import java.util.HashMap;
 import java.util.Map;
