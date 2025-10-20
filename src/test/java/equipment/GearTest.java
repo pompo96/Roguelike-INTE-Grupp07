@@ -1,21 +1,20 @@
-package utrustningTest;
+package equipment;
 
 import org.junit.jupiter.api.Test;
-import utrustning.Utrustning;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class UtrustningTest {
+public class GearTest {
 
     @Test
     public void testUtrustning() {
-        Utrustning ut = new Utrustning();
+        Gear ut = new Gear();
         assertEquals(true, ut.getValue());
     }
 
     @Test
     public void weaponHadIDNameStatsAndType(){
-        Utrustning sword = new Utrustning(1, "Flamesword", 14);
+        Gear sword = new Gear(1, "Flamesword", 14);
         assertEquals(true, sword.getValue());
         assertEquals(1, sword.getID());
         assertEquals("Flamesword", sword.getName());

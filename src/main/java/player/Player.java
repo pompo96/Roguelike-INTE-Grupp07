@@ -1,7 +1,7 @@
-package spelare;
+package player;
 
 import race.Race;
-import utrustning.Item;
+import equipment.Item;
 
 import java.util.HashMap;
 import java.util.Map;

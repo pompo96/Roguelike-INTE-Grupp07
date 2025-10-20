@@ -3,7 +3,7 @@ package story;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import race.Race;
-import spelare.Player;
+import player.Player;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

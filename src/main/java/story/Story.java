@@ -1,7 +1,7 @@
 package story;
 
 
-import spelare.Player;
+import player.Player;
 
 
 public class Story {

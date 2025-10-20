@@ -1,4 +1,4 @@
-package utrustning;
+package equipment;
 
 public interface Item {
     int getLifeModifier();

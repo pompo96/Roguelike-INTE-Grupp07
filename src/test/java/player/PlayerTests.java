@@ -1,8 +1,8 @@
-package spelare;
+package player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import race.Race;
-import utrustning.Item;
+import equipment.Item;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -197,6 +197,7 @@ public class PlayerTests {
         Race race = defaultPlayer.getRace();
         assertEquals(mockRace, race);
     }
+
     // Story progress map (questname -> completed(boolean))
 
     @Test
@@ -366,7 +367,5 @@ public class PlayerTests {
 
 
     // Questlog list(questObjects) // Yousef
-
-
 
 }
