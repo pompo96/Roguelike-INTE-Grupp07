@@ -39,7 +39,6 @@ public class PlayerTests {
 
         //Skapa en quest interface för att använda mock?
         mockQuestList = mock(Quest.class);
-
         mockRace = mock(Race.class);
         mockItemWeapon = mock(Item.class);
         mockItemChestpiece = mock(Item.class);
@@ -168,7 +167,52 @@ public class PlayerTests {
 
 
     @Test
-    public void questCompletion
+    public void questCompletion_updatesMockedHashMap(){
+        //Hashmap mocked
+        Map<String, Boolean> mockQuestMap = mock(Map.class);
+        defaultPlayer.setQuest(mockQuestMap);
+
+        //Test it
+        defaultPlayer.questWasCompleted("TestQuest");
+
+        //Verification
+        verify(mockQuestMap).put("TestQuest", true);
+
+    }
+
+    @Test
+    public void isQuestComplete_checksMockedHashMap(){
+        Map<String, Boolean> mockQuestMap = mock(Map.class);
+        defaultPlayer.setQuest(mockQuestMap);
+
+        when(mockQuestMap.getOrDefault("ShoppingQuest", false)).thenReturn(true);
+
+        boolean result = defaultPlayer.isQuestComplete("ShoppingQuest");
+
+        assertEquals(true, result);
+        verify(mockQuestMap).getOrDefault("ShoppingQuest", false);
+    }
+
+    @Test
+    public void questWasStarted_updateMockedHashMapWithFalse(){
+        Map<String, Boolean> mockQuestMap = mock(Map.class);
+        defaultPlayer.setQuest(mockQuestMap);
+
+        defaultPlayer.questWasStarted("BeatDragon");
+
+        verify(mockQuestMap).put("BeatDragon", false);
+    }
+
+    @Test
+    public void mockQuestID_fromInterfaceUpdatesHashMap(){
+        Map<String, Boolean> mockQuestMap = mock(Map.class);
+        defaultPlayer.setQuest(mockQuestMap);
+
+        String questID = mockQuestList.getQuestID();
+        defaultPlayer.questWasCompleted(questID);
+
+        verify(mockQuestMap).put("MockQuest", true);
+    }
 
     @Test
     public void completedQuest_returnsTrue(){
@@ -198,6 +242,8 @@ public class PlayerTests {
         defaultPlayer.questWasStarted(questID);
         boolean result = defaultPlayer.isQuestStarted(questID);
         assertEquals(true, result, "Quest should be started");
+
+
     }
 
     @Test
