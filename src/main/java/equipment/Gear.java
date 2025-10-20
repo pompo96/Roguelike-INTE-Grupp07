@@ -1,6 +1,6 @@
-package utrustning;
+package equipment;
 
-public class Utrustning {
+public class Gear {
 
     private final boolean itemExists;
     private int id;
@@ -9,10 +9,10 @@ public class Utrustning {
     private String type; //"weapon", "armor", "shoes"
 
 
-    public Utrustning(){
+    public Gear(){
         this.itemExists = true;
     }
-    public Utrustning(int id, String name, int damage){
+    public Gear(int id, String name, int damage){
         this.itemExists = true;
         this.id = id;
         this.name = name;

@@ -1,7 +1,7 @@
-package spelare;
+package player;
 
 import race.Race;
-import utrustning.Item;
+import equipment.Item;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,7 @@ public class Player {
     Map<String, Boolean> questProgress;
     private List<Quest> activeQuests;
     private boolean questLogOpen;
+    private Map<String, Object> questItems;
 
     public Player(Race race) {
         this(race, emptyItemList());
@@ -40,6 +41,7 @@ public class Player {
         questProgress = new HashMap<>();
         this.activeQuests = new ArrayList<>();
         this.questLogOpen = false;
+        this.questItems = new HashMap<>();
     }
 
     private static Map<String, Item> emptyItemList() {
@@ -57,7 +59,7 @@ public class Player {
         return questProgress.containsKey(questID);
     }
     public boolean isQuestComplete(String questID){
-        return questProgress.get(questID);
+        return questProgress.getOrDefault(questID, false);
     }
 
     public int getMaxLife() {
@@ -199,6 +201,15 @@ public void openQuestLog() {
         String getID();
         String getName();
         String getDescription();
+    }
+
+    public void addQuestItem(String itemName, Object item) {
+        this.questItems.put(itemName, item);
+    }
+
+
+    public boolean hasItem(String itemName) {
+        return this.questItems.containsKey(itemName) && this.questItems.get(itemName) != null;
     }
 }
 
