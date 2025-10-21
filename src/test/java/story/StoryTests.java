@@ -58,6 +58,50 @@ public class StoryTests {
         assertTrue(questDungeonBeat instanceof Player.Quest, "Quest borde implementera Player.Quest");
     }
 
+    @Test
+    public void quest_startsInNotStartedState() {
+        assertEquals(Story.QuestState.NOT_STARTED, questDungeonBeat.getState(), "Quest borde starta i NOT_STARTED state");
+    }
+
+    @Test
+    public void quest_canBeStarted() {
+        questDungeonBeat.startQuest();
+        assertEquals(Story.QuestState.ACTIVE, questDungeonBeat.getState(), "Quest borde vara ACTIVE efter start");
+    }
+
+    @Test
+    public void quest_cannotBeStartedTwice() {
+        questDungeonBeat.startQuest();
+        questDungeonBeat.startQuest();
+        assertEquals(Story.QuestState.ACTIVE, questDungeonBeat.getState(), "Quest borde fortfarande vara ACTIVE");
+    }
+
+    @Test
+    public void quest_canBeCompleted() {
+        questDungeonBeat.startQuest();
+        questDungeonBeat.completeQuest();
+        assertEquals(Story.QuestState.COMPLETED, questDungeonBeat.getState(), "Quest borde vara COMPLETED");
+    }
+
+    @Test
+    public void quest_cannotBeCompletedWithoutStarting() {
+        questDungeonBeat.completeQuest();
+        assertEquals(Story.QuestState.NOT_STARTED, questDungeonBeat.getState(), "Quest borde fortfarande vara NOT_STARTED");
+    }
+
+    @Test
+    public void quest_canBeFailed() {
+        questDungeonBeat.startQuest();
+        questDungeonBeat.failQuest();
+        assertEquals(Story.QuestState.FAILED, questDungeonBeat.getState(), "Quest borde vara FAILED");
+    }
+
+    @Test
+    public void quest_cannotBeFailedWithoutStarting() {
+        questDungeonBeat.failQuest();
+        assertEquals(Story.QuestState.NOT_STARTED, questDungeonBeat.getState(), "Quest borde fortfarande vara NOT_STARTED");
+    }
+
 
     @Test
     public void questItem_hasCorrectName() {

@@ -6,17 +6,26 @@ import spelare.Player;
 
 public class Story {
 
+    public enum QuestState {
+        NOT_STARTED,
+        ACTIVE,
+        COMPLETED,
+        FAILED
+    }
+
 
     public static class Quest implements Player.Quest {
         private String id;
         private String name;
         private String description;
+        private QuestState state;
 
 
         public Quest(String id, String name, String description) {
             this.id = id;
             this.name = name;
             this.description = description;
+            this.state = QuestState.NOT_STARTED;
         }
 
 
@@ -36,8 +45,29 @@ public class Story {
         public String getDescription() {
             return this.description;
         }
-    }
 
+        public QuestState getState() {
+            return this.state;
+        }
+
+        public void startQuest() {
+            if (this.state == QuestState.NOT_STARTED) {
+                this.state = QuestState.ACTIVE;
+            }
+        }
+
+        public void completeQuest() {
+            if (this.state == QuestState.ACTIVE) {
+                this.state = QuestState.COMPLETED;
+            }
+        }
+
+        public void failQuest() {
+            if (this.state == QuestState.ACTIVE) {
+                this.state = QuestState.FAILED;
+            }
+        }
+    }
 
 
     public static class QuestItem {
@@ -91,7 +121,6 @@ public class Story {
                 player.acceptQuest(this.quest);
             }
         }
-
 
 
         public boolean completeQuestIfPlayerHasItem(Player player) {
