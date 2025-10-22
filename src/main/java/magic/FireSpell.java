@@ -15,11 +15,11 @@ public class FireSpell implements Magic {
         if (checkIfAbleToCast()) {
             //cast spell
         }
-        if (caster.getRace() instanceof Dwarf) {
-            damage =+ 10;
+        if (target.getRace() instanceof Dwarf) {
+            damage -= 5;
         }
         if (target.getRace() instanceof Elf) {
-            damage =+ 10;
+            damage += 10;
         }
         return damage;
     }

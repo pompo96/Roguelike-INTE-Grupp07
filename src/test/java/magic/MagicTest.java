@@ -1,6 +1,7 @@
 package magic;
 import player.Player;
 import race.Elf;
+import race.Dwarf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import equipment.Item;
@@ -30,7 +31,20 @@ public class MagicTest {
 
         int damageOnElf = fireSpell.castSpell(caster, target);
 
-        assertEquals(fireSpellDamageAgainstElf, damageOnElf, "Fire Damage ska bli dubbelt mot elfs");
+        assertEquals(fireSpellDamageAgainstElf, damageOnElf, "Fire damage ska öka med 10");
+    }
+    @Test
+    public void fireSpell_DealsLessDamageToDwarf(){
+        int fireSpellDamageAgainstDwarf = 5;
+        Player caster = mock(Player.class);
+        Player target = mock(Player.class);
+        when(target.getRace()).thenReturn(new Dwarf());
+
+        FireSpell fireSpell = new FireSpell();
+
+        int damageOnDwarf = fireSpell.castSpell(caster, target);
+
+        assertEquals(fireSpellDamageAgainstDwarf, damageOnDwarf, "Fire damage ska sänkas med 5");
     }
 
 }
