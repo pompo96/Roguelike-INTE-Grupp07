@@ -11,6 +11,14 @@ public class Story {
         FAILED
     }
 
+    public enum DungeonStage {
+        SEARCHING_FOR_KEY_FRAGMENT_1,
+        FRAGMENT_1_FOUND,
+        SEARCHING_FOR_KEY_FRAGMENT_2,
+        BOTH_FRAGMENTS_FOUND,
+        KEY_ASSEMBLED
+    }
+
 
     public static class Quest implements Player.Quest {
         private String id;
@@ -66,6 +74,8 @@ public class Story {
             }
         }
     }
+
+
 
 
     public static class QuestItem {
@@ -129,4 +139,11 @@ public class Story {
             return false;
         }
     }
+
+    public interface Area {
+        boolean hasKeyFragment1();
+        boolean hasKeyFragment2();
+        String getAreaName();
+    }
+
 }

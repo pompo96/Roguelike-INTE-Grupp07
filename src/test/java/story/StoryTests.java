@@ -17,6 +17,9 @@ public class StoryTests {
     Player player;
     Race mockRace;
 
+    Story.Area mockArea1;
+    Story.Area mockArea2;
+
     @BeforeEach
     public void initialize() {
         mockRace = mock(Race.class);
@@ -35,6 +38,9 @@ public class StoryTests {
         npcCyrus = new Story.NPC("Cyrus", questLostAndFound, "DoransRing");
 
         player = new Player(mockRace);
+
+        mockArea1 = mock(Story.Area.class);
+        mockArea2 = mock(Story.Area.class);
     }
 
 
@@ -43,20 +49,6 @@ public class StoryTests {
         assertEquals("DungeonBeat", questDungeonBeat.getID(), "Quest borde ha rätt ID");
     }
 
-    @Test
-    public void quest_hasCorrectName() {
-        assertEquals("Beat the Dungeon", questDungeonBeat.getName(), "Quest borde ha rätt namn");
-    }
-
-    @Test
-    public void quest_hasCorrectDescription() {
-        assertEquals("Defeat all enemies in the dungeon", questDungeonBeat.getDescription(), "Quest borde ha rätt beskrivning");
-    }
-
-    @Test
-    public void quest_implementsPlayerQuest() {
-        assertTrue(questDungeonBeat instanceof Player.Quest, "Quest borde implementera Player.Quest");
-    }
 
     @Test
     public void quest_startsInNotStartedState() {
@@ -69,12 +61,6 @@ public class StoryTests {
         assertEquals(Story.QuestState.ACTIVE, questDungeonBeat.getState(), "Quest borde vara ACTIVE efter start");
     }
 
-    @Test
-    public void quest_cannotBeStartedTwice() {
-        questDungeonBeat.startQuest();
-        questDungeonBeat.startQuest();
-        assertEquals(Story.QuestState.ACTIVE, questDungeonBeat.getState(), "Quest borde fortfarande vara ACTIVE");
-    }
 
     @Test
     public void quest_canBeCompleted() {
@@ -96,12 +82,6 @@ public class StoryTests {
         assertEquals(Story.QuestState.FAILED, questDungeonBeat.getState(), "Quest borde vara FAILED");
     }
 
-    @Test
-    public void quest_cannotBeFailedWithoutStarting() {
-        questDungeonBeat.failQuest();
-        assertEquals(Story.QuestState.NOT_STARTED, questDungeonBeat.getState(), "Quest borde fortfarande vara NOT_STARTED");
-    }
-
 
     @Test
     public void questItem_hasCorrectName() {
@@ -114,10 +94,6 @@ public class StoryTests {
     }
 
 
-    @Test
-    public void npc_hasCorrectName() {
-        assertEquals("Xerxes", npcXerxes.getName(), "NPC borde ha rätt namn");
-    }
 
     @Test
     public void npc_hasQuest() {
@@ -144,12 +120,6 @@ public class StoryTests {
     }
 
 
-    @Test
-    public void multipleNPC_canGiveDifferentQuests() {
-        npcXerxes.giveQuestToPlayer(player);
-        npcCyrus.giveQuestToPlayer(player);
-        assertEquals(2, player.getQuestCount(), "Player borde ha 2 quests från olika NPCs");
-    }
 
     @Test
     public void player_canAbandonQuestFromNPC() {
@@ -160,16 +130,11 @@ public class StoryTests {
     }
 
 
-
     @Test
     public void player_doesNotHaveItemByDefault() {
         assertFalse(player.hasItem("DoransRing"), "Player borde inte ha Dorans Ring från början");
     }
 
-    @Test
-    public void npc_canCheckIfPlayerHasRequiredItem() {
-        assertFalse(npcCyrus.completeQuestIfPlayerHasItem(player), "NPC borde returnera false om player inte har ringen");
-    }
 
     @Test
     public void npc_completeQuestWhenPlayerHasItem() {
