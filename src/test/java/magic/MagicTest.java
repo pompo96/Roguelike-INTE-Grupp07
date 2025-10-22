@@ -28,7 +28,7 @@ public class MagicTest {
 
         FireSpell fireSpell = new FireSpell();
 
-        int damageOnElf = fireSpell.damageCalculation(caster, target);
+        int damageOnElf = fireSpell.castSpell(caster, target);
 
         assertEquals(fireSpellDamageAgainstElf, damageOnElf, "Fire Damage ska bli dubbelt mot elfs");
     }
