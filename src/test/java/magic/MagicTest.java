@@ -1,8 +1,8 @@
 package magic;
-
+import player.Player;
+import race.Elf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import race.Race;
 import equipment.Item;
 
 import java.util.HashMap;
@@ -15,7 +15,22 @@ import static org.mockito.Mockito.*;
 public class MagicTest {
     @Test
     public void fireSpell_HasTypeFire(){
+        FireSpell fireSpell = new FireSpell();
+        assertEquals("fire", fireSpell.getMagicType());
+    }
+    @Test
+    public void fireSpell_DealsExtraDamageToElf(){
+        int fireSpellDamageAgainstElf = 20;
 
+        Player caster = mock(Player.class);
+        Player target = mock(Player.class);
+        when(target.getRace()).thenReturn(new Elf());
+
+        FireSpell fireSpell = new FireSpell();
+
+        int damageOnElf = fireSpell.damageCalculation(caster, target);
+
+        assertEquals(fireSpellDamageAgainstElf, damageOnElf, "Fire Damage ska bli dubbelt mot elfs");
     }
 
 }

@@ -1,14 +1,21 @@
 package magic;
 
+import player.Player;
+import race.Elf;
+
 public class FireSpell implements Magic{
+    private int damage = getBaseDamage();
     private MagicInformation info = new MagicInformation();
     public String getMagicType(){
         return "fire";
     }
-    public int getManaCost(){
-        return 10;
+    public int damageCalculation(Player caster, Player target){
+        if(target.getRace() instanceof Elf){
+            damage *= 2;
+        }
+        return damage;
     }
-    public void castSpell(){
+    public void castSpell(Player caster, Player target){
         if(checkIfAbleToCast(info)){
             //cast spell
         }
