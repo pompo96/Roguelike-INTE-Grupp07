@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class StoryTests {
-    Story.Quest questDungeonBeat;
     Story.Quest questLostAndFound;
+    Story.DungeonQuest questDungeonBeat;
     Story.NPC npcXerxes;
     Story.NPC npcCyrus;
     Story.QuestItem doransRing;
@@ -27,7 +27,7 @@ public class StoryTests {
         when(mockRace.getMovementModifier()).thenReturn(2);
         when(mockRace.getAttackPowerModifier()).thenReturn(5);
 
-        questDungeonBeat = new Story.Quest("DungeonBeat", "Beat the Dungeon", "Defeat all enemies in the dungeon");
+        questDungeonBeat = new Story.DungeonQuest("DungeonBeat", "Beat the Dungeon", "Find key fragments, unlock dungeon, defeat boss");
         questLostAndFound = new Story.Quest("LostAndFound", "Find the Lost Artifact", "Search for the artifact in the forest");
 
 
@@ -41,6 +41,64 @@ public class StoryTests {
 
         mockArea1 = mock(Story.Area.class);
         mockArea2 = mock(Story.Area.class);
+    }
+    @Test
+    public void dungeonQuest_canFindFragment1InArea1() {
+        when(mockArea1.hasKeyFragment1()).thenReturn(true);
+        questDungeonBeat.startQuest();
+
+        assertTrue(questDungeonBeat.findKeyFragment1(mockArea1));
+        assertEquals(Story.DungeonStage.FRAGMENT_1_FOUND, questDungeonBeat.getCurrentStage());
+        assertTrue(questDungeonBeat.hasFragment1());
+    }
+
+    @Test
+    public void dungeonQuest_canFindFragment2InArea2() {
+        when(mockArea1.hasKeyFragment1()).thenReturn(true);
+        when(mockArea2.hasKeyFragment2()).thenReturn(true);
+        questDungeonBeat.startQuest();
+        questDungeonBeat.findKeyFragment1(mockArea1);
+        questDungeonBeat.searchForFragment2();
+
+        assertTrue(questDungeonBeat.findKeyFragment2(mockArea2));
+        assertEquals(Story.DungeonStage.BOTH_FRAGMENTS_FOUND, questDungeonBeat.getCurrentStage());
+        assertTrue(questDungeonBeat.hasFragment2());
+    }
+
+    @Test
+    public void dungeonQuest_canAssembleKeyFromTwoFragments() {
+        when(mockArea1.hasKeyFragment1()).thenReturn(true);
+        when(mockArea2.hasKeyFragment2()).thenReturn(true);
+        questDungeonBeat.startQuest();
+        questDungeonBeat.findKeyFragment1(mockArea1);
+        questDungeonBeat.searchForFragment2();
+        questDungeonBeat.findKeyFragment2(mockArea2);
+
+        assertTrue(questDungeonBeat.assembleKey());
+        assertEquals(Story.DungeonStage.KEY_ASSEMBLED, questDungeonBeat.getCurrentStage());
+        assertTrue(questDungeonBeat.hasCompleteKey());
+    }
+
+    @Test // Fråga till handledare, är detta test i rätt riktning?
+    public void fightLog_tracksDamageFromEnemy() {
+        when(mockArea1.hasKeyFragment1()).thenReturn(true);
+        when(mockArea2.hasKeyFragment2()).thenReturn(true);
+        when(mockEnemy.getDamage()).thenReturn(10);
+
+        questDungeonBeat.startQuest();
+        questDungeonBeat.findKeyFragment1(mockArea1);
+        questDungeonBeat.searchForFragment2();
+        questDungeonBeat.findKeyFragment2(mockArea2);
+        questDungeonBeat.assembleKey();
+        questDungeonBeat.approachDungeonDoor();
+        questDungeonBeat.insertKeyInDoor(mockDoor, true);
+
+        Story.FightLog fightLog = questDungeonBeat.getFightLog();
+
+        questDungeonBeat.killEnemy(mockEnemy);
+
+        assertEquals(1, fightLog.getLogSize());
+        assertTrue(fightLog.getLogEntries().get(0).contains("-10HP"));
     }
 
 
