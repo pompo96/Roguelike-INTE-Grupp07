@@ -8,13 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DungeonMapManagerTest {
     private final DefaultTileFactory tileFactory = new DefaultTileFactory();
     private int seedHeight;
     private int seedWidth;
-
+    private static final char START_SYMBOL = '⨇';
+    private static final char END_SYMBOL = 'E';
     DungeonMapManager dungeonMapManager;
 
     @BeforeEach
@@ -69,16 +73,36 @@ public class DungeonMapManagerTest {
         3. corners are always walls or entry/exit
      ---- Tests ----
      Map is valid so, contains a walkable path between entrace and exit, no missing tiles,
-     Test map entrance and exit dont spawn next to eachother, maybe minimum traversal distance?
 
-     Test -> go from entrance to exit
+     Todo below
+     Test map entrance and exit dont spawn next to eachother, maybe minimum traversal distance?
      Test tile "sets" like bridge spawning a straight bridge x tiles long etc
      Test that floor spawns the proper map and uses proper structures and tiles
      */
 
     @Test
-    public void testPathExistsEntranceToExit(){
+    public void testMapHasNoMissingTiles(){
 
+    }
+
+    @Test
+    public void playerWalk_UpdatesTiles(){
+
+    }
+
+    @Test
+    public void playerWalkOverItem_PicksItemFromTile(){
+
+    }
+
+    @Test
+    public void testPathExistsEntranceToExit() {
+        Tile[][] map = dungeonMapManager.getMap();
+        WalkablePathFinder pathFinder = new WalkablePathFinder(map, START_SYMBOL, END_SYMBOL);
+
+        boolean exists = pathFinder.pathExists();
+
+        assertTrue(exists);
     }
 
     @Test
