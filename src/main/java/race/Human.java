@@ -1,13 +1,8 @@
-//package race;
-//
-//public class Human implements Race{
-//    @Override
-//    public int getLifeModifier() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int getMovementModifier() {
-//        return 0;
-//    }
-//}
+package race;
+
+public class Human extends AbstractRace{
+
+    public Human(){
+        super(0,0,0,"Human");
+    }
+}
