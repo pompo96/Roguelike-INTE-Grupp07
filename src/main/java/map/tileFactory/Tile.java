@@ -1,22 +1,15 @@
 package map.tileFactory;
 
-public abstract class Tile {
+import gameObject.GameObject;
+
+public abstract class Tile extends GameObject {
     protected int x,y;
     private final boolean isWalkable;
-    private final char tileSymbol;
 
     public Tile(int y, int x, boolean isWalkable, char tileSymbol) {
-        this.x = x;
-        this.y = y;
-        this.tileSymbol = tileSymbol;
+        super(y, x, tileSymbol);
         this.isWalkable = isWalkable;
     }
-
     public boolean isWalkable(){return isWalkable;}
-    public char getTileSymbol(){return tileSymbol;}
 
-    @Override
-    public String toString() {
-        return String.valueOf(tileSymbol);
-    }
 }

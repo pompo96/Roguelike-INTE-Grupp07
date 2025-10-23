@@ -14,6 +14,7 @@ public class DungeonMapManager {
     }
 
     public Tile[][] getMap(){
+        return currentMap;
     }
 
     public int getHeight(){
@@ -23,5 +24,6 @@ public class DungeonMapManager {
         return currentMap[0].length;
     }
     public String render() {
+        return "";
     }
 }

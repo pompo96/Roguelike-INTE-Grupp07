@@ -49,15 +49,14 @@ public class DungeonMapManagerTest {
         });
     }
 
+    //todo finish implementing this
     @Test
     public void renderMap_returnsCharGrid(){
-        DungeonMapManager dungeonMapManager = new DungeonMapManager(5, 5);
         String render = dungeonMapManager.render();
     }
 
     @Test
     public void testGridContainsNoEmptyTiles(){
-        DungeonMapManager dungeonMapManager = new DungeonMapManager(5, 5);
         Tile[][] map = dungeonMapManager.getMap();
         for(Tile[] row : map){
             for(Tile tile : row){
@@ -67,11 +66,7 @@ public class DungeonMapManagerTest {
     }
 
     /**
-        Invariant test scenarios
-        1. entry exit always on border todo add not in corners too
-        2. No Empty tiles
-        3. corners are always walls or entry/exit
-     ---- Tests ----
+          ---- Tests ----
      Map is valid so, contains a walkable path between entrace and exit, no missing tiles,
 
      Todo below
@@ -79,11 +74,6 @@ public class DungeonMapManagerTest {
      Test tile "sets" like bridge spawning a straight bridge x tiles long etc
      Test that floor spawns the proper map and uses proper structures and tiles
      */
-
-    @Test
-    public void testMapHasNoMissingTiles(){
-
-    }
 
     @Test
     public void playerWalk_UpdatesTiles(){
