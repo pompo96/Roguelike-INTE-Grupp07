@@ -59,6 +59,8 @@ public class PlayerTests {
         when(mockRace.getName()).thenReturn("human");
 
         when(mockQuestList.getQuestID()).thenReturn("MockQuest");
+        //when(mockQuestList.getQuestID()).thenReturn(); try to return a whole quest hashmap to be tested
+
 
         defaultPlayer = new Player(mockRace);
     }
@@ -220,6 +222,7 @@ public class PlayerTests {
         defaultPlayer.questWasCompleted(questID);
         boolean result = defaultPlayer.isQuestComplete(questID);
         assertEquals(true, result, "Quest should be completed.");
+        //System.out.println(mockQuestList);
     }
 
     @Test

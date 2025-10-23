@@ -1,3 +1,4 @@
+//Double check if the hashmap for quest was done right
 package spelare;
 
 import race.Race;
@@ -49,12 +50,16 @@ public class Player {
 
     public void questWasCompleted(String questID){
         if (questID == null || questID.trim().isEmpty()){
+            System.out.println("This questID was either an empty string or null");
             return; //Maybe return an exception instead? These checks are for the developers (us) only. Now gotta make some tests for the null values and mocking.
         }
         questProgress.put(questID, true);
+        System.out.println(questProgress);
     }
+    //Should be used when the player talks to an NPC that gives them a quest
     public void questWasStarted(String questID){
         if (questID == null || questID.trim().isEmpty()){
+            System.out.println("This questID was either an empty string or null");
             return;
         }
         questProgress.put(questID, false);
@@ -63,13 +68,17 @@ public class Player {
         if (questID == null || questID.trim().isEmpty()){
             return false;
         }
+        System.out.println(questProgress);
         return questProgress.containsKey(questID);
     }
     public boolean isQuestComplete(String questID){
         if (questID == null || questID.trim().isEmpty()){
+            System.out.println("This questID was either an empty string or null");
             return false;
         }
+        System.out.println(questProgress);
         return questProgress.getOrDefault(questID, false);
+
     }
 
     public int getMaxLife() {
