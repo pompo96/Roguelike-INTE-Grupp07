@@ -48,15 +48,27 @@ public class Player {
     }
 
     public void questWasCompleted(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            return; //Maybe return an exception instead? These checks are for the developers (us) only. Now gotta make some tests for the null values and mocking.
+        }
         questProgress.put(questID, true);
     }
     public void questWasStarted(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            return;
+        }
         questProgress.put(questID, false);
     }
     public boolean isQuestStarted(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            return false;
+        }
         return questProgress.containsKey(questID);
     }
     public boolean isQuestComplete(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            return false;
+        }
         return questProgress.getOrDefault(questID, false);
     }
 

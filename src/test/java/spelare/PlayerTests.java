@@ -255,6 +255,11 @@ public class PlayerTests {
         assertEquals(false, defaultPlayer.isQuestComplete(questID));
     }
 
+    @Test
+    public void testToStringQuests(){
+        //later
+    }
+
     // Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
     //ska ta en map där vapen,armour,boots är tom
     @Test
