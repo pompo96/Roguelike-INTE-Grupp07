@@ -1,6 +1,4 @@
 package magic;
-
-import org.junit.jupiter.api.Test;
 import player.Player;
 import race.Dwarf;
 import race.Elf;
