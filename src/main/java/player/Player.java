@@ -1,5 +1,6 @@
 package player;
 
+import gameObject.GameObject;
 import race.Race;
 import equipment.Item;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public class Player extends GameObject {
     private int maxLife;
     private int currentLife;
     private int movementSpeed;
@@ -25,11 +26,9 @@ public class Player {
     private boolean questLogOpen;
     private Map<String, Object> questItems;
 
-    public Player(Race race) {
-        this(race, emptyItemList());
-    }
 
-    public Player(Race race, Map<String, Item> defaultItems) {
+    public Player(Race race, Map<String, Item> defaultItems, int y, int x, char symbol, String name) {
+        super(y,x, symbol);
         this.race = race;
         this.maxLife = DEFAULT_LIFE + race.getLifeModifier();
         this.currentLife = this.maxLife;
