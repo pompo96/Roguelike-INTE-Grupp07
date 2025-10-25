@@ -1,4 +1,6 @@
 package map;
+import map.mapGeneration.GenerationStrategy;
+import map.mapGeneration.strategies.SimpleFillStrategy;
 import map.tileFactory.*;
 import map.tiles.Entrance;
 import map.tiles.Exit;
@@ -8,57 +10,58 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DungeonMapManagerTest {
-    private final DefaultTileFactory tileFactory = new DefaultTileFactory();
     private int seedHeight;
     private int seedWidth;
     private static final char START_SYMBOL = '⨇';
     private static final char END_SYMBOL = 'E';
     DungeonMapManager dungeonMapManager;
+    GenerationStrategy strategy;
 
     @BeforeEach
     public void setUp() {
         this.seedHeight = 10;
         this.seedWidth = 10;
-        dungeonMapManager = new DungeonMapManager(seedHeight, seedWidth);
+        strategy = new SimpleFillStrategy();
+        dungeonMapManager = new DungeonMapManager();
+        dungeonMapManager.makeMap(seedHeight, seedWidth, strategy);
     }
-
+    //Todo test for swapping currentMap if exit reached.
+    //Todo test having multiple maps
+    //Todo make exit and entrace be connected to a map somehow(index)
     @Test
     public void constructor_SetsCorrectDimensions(){
         seedHeight = 5;
         seedWidth = 10;
-        DungeonMapManager dungeonMapManager = new DungeonMapManager(seedHeight, seedWidth);
+        DungeonMapManager dungeonMapManager = new DungeonMapManager();
+        dungeonMapManager.makeMap(seedHeight, seedWidth, strategy);
 
-        int mapHeight = dungeonMapManager.getHeight();
-        int mapWidth = dungeonMapManager.getWidth();
+        int mapHeight = dungeonMapManager.getMap().getHeight();
+        int mapWidth = dungeonMapManager.getMap().getWidth();
 
         assertEquals(mapHeight, seedHeight);
         assertEquals(mapWidth, seedWidth);
     }
 
     @ParameterizedTest
-    @CsvSource(value = { "-1,10", "10, -1"})
-    public void negativeDimensions_ThrowsException(int width, int height){
-        assertThrows(IllegalArgumentException.class, () -> {
-            new DungeonMapManager(height, width);
-        });
+    @CsvSource(value = { "0,10", "10, 0"})
+    public void nonPositiveDimensions_ThrowsException(int seedHeight, int seedWidth) {
+        dungeonMapManager = new DungeonMapManager();
+        assertThrows(IllegalArgumentException.class, () -> dungeonMapManager.makeMap(seedHeight, seedWidth, strategy));
     }
 
     //todo finish implementing this
-    @Test
-    public void renderMap_returnsCharGrid(){
-        String render = dungeonMapManager.render();
-    }
+//    @Test
+//    public void drawMapMap_returnsCharGrid(){
+//        String render = dungeonMapManager.drawMap();
+//    }
 
     @Test
     public void testGridContainsNoEmptyTiles(){
-        Tile[][] map = dungeonMapManager.getMap();
-        for(Tile[] row : map){
+        DungeonMap map = dungeonMapManager.getMap();
+        for(Tile[] row : map.getTileGrid()){
             for(Tile tile : row){
                 assertNotNull(tile);
             }
@@ -87,24 +90,29 @@ public class DungeonMapManagerTest {
 
     @Test
     public void testPathExistsEntranceToExit() {
-        Tile[][] map = dungeonMapManager.getMap();
+        DungeonMap map = dungeonMapManager.getMap();
         WalkablePathFinder pathFinder = new WalkablePathFinder(map, START_SYMBOL, END_SYMBOL);
 
         boolean exists = pathFinder.pathExists();
-
+        dungeonMapManager.drawMap();
         assertTrue(exists);
     }
 
     @Test
+    public void testPathDoesntExistEntranceToExit(){
+
+    }
+
+    @Test
     public void testMapBorderOnlyWalls(){
-        Tile[][] generatedMap = dungeonMapManager.getMap();
-        int mapHeight = dungeonMapManager.getHeight();
-        int mapWidth = dungeonMapManager.getWidth();
+        DungeonMap generatedMap = dungeonMapManager.getMap();
+        int mapHeight = generatedMap.getHeight();
+        int mapWidth = generatedMap.getWidth();
 
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
                 if (isBorder(y, x, mapHeight, mapWidth)) {
-                    assertInstanceOf(Wall.class, generatedMap[y][x]);
+                    assertInstanceOf(Wall.class, generatedMap.getTileGrid()[y][x]);
                 }
             }
 
@@ -122,12 +130,12 @@ public class DungeonMapManagerTest {
 
     @Test
     void testHasEntranceAndExit() {
-        Tile[][] map = dungeonMapManager.getMap();
+        DungeonMap map = dungeonMapManager.getMap();
 
         boolean hasEntrance = false;
         boolean hasExit = false;
 
-        for (Tile[] row : map) {
+        for (Tile[] row : map.getTileGrid()) {
             for (Tile tile : row) {
                 if (tile instanceof Entrance) hasEntrance = true;
                 if (tile instanceof Exit) hasExit = true;

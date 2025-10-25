@@ -1,4 +1,5 @@
 package map.mapGeneration;
+import map.DungeonMap;
 import map.tileFactory.Tile;
 import map.tileFactory.TileFactory;
 
@@ -11,5 +12,6 @@ public interface GenerationStrategy {
      * @param height  map height (rows)
      * @return a height x width Tile[][] map
      */
-    Tile[][] generate(TileFactory factory, int height, int width);
+    DungeonMap generate(TileFactory factory, int height, int width);
+
 }

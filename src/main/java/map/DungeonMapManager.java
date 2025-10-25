@@ -1,29 +1,44 @@
 package map;
 import java.util.*;
 
+import map.mapGeneration.GenerationStrategy;
 import map.tileFactory.DefaultTileFactory;
 import map.tileFactory.Tile;
 
 public class DungeonMapManager {
-    private final DefaultTileFactory factory = new DefaultTileFactory();
-    private final Map<String, Tile[][]> maps = new HashMap<>();
-    private Tile[][] currentMap;
-    private String currentMapId;
+    private final DefaultTileFactory factory;
+    private final Map<Integer, DungeonMap> maps;
+    private DungeonMap currentMap;
+    private int floor;
 
-    public DungeonMapManager(int height, int width) {
+    public DungeonMapManager() {
+        this.factory = new DefaultTileFactory();
+        this.maps = new HashMap<>();
+        this.floor = 0;
     }
 
-    public Tile[][] getMap(){
+    public void makeMap(int height, int width, GenerationStrategy strategy) throws IllegalArgumentException {
+        if(height < 1 || width < 1) {
+            throw new IllegalArgumentException();
+        }
+        currentMap = strategy.generate(factory, height, width);
+        floor++;
+        maps.put(floor, currentMap);
+    }
+
+    public DungeonMap getMap(){
         return currentMap;
     }
 
-    public int getHeight(){
-        return currentMap.length;
-    }
-    public int getWidth(){
-        return currentMap[0].length;
-    }
-    public String render() {
-        return "";
+
+    public String drawMap() {
+        StringBuilder sb = new StringBuilder();
+        for(Tile[] row : currentMap.getTileGrid()){
+            for(Tile tile : row){
+                sb.append(tile.toString());
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
