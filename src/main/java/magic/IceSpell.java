@@ -7,19 +7,22 @@ import race.Dwarf;
 public class IceSpell implements Magic {
     int damage = getBaseDamage();
     private int numberOfUses = 2;
+
     @Override
     public String getMagicType() {
-        return "ice";
+        return "IceSpell";
     }
+
     @Override
-    public int getNumberOfUses(){
+    public int getNumberOfUses() {
         return numberOfUses;
     }
+
     @Override
     public int castSpell(Player caster, Player target) {
         int modifiedDamage = damage;
 
-        if(getNumberOfUses() == 0){
+        if (getNumberOfUses() == 0) {
             return 0;
         }
         if (checkIfAbleToCast()) {
@@ -27,13 +30,12 @@ public class IceSpell implements Magic {
         }
         if (target.getRace() instanceof Dwarf) {
             modifiedDamage = damage + 10;
-            numberOfUses--;
 
         }
         if (target.getRace() instanceof Elf) {
             modifiedDamage = damage - 5;
-            numberOfUses--;
         }
+        numberOfUses--;
         return modifiedDamage;
     }
 
@@ -45,5 +47,10 @@ public class IceSpell implements Magic {
     @Override
     public int checkEnvironmentBoost() {
         return 1;
+    }
+
+    @Override
+    public String toString() {
+        return toStringDescription();
     }
 }

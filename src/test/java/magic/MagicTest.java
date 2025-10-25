@@ -3,18 +3,36 @@ package magic;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import player.Player;
 import race.Elf;
 import race.Dwarf;
 import org.junit.jupiter.api.BeforeEach;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class MagicTest {
-    @Test
-    public void fireSpell_HasTypeFire() {
-        FireSpell fireSpell = new FireSpell();
-        assertEquals("fire", fireSpell.getMagicType());
+    @ParameterizedTest
+    @MethodSource("spellProvider")
+    void spells_ShouldNotCastMoreThanItsSpecifiedAmount(Magic spell) {
+        Player caster = mock(Player.class);
+        Player target = mock(Player.class);
+        int amountOfUses = spell.getNumberOfUses();
+        for (int i = 0; i < amountOfUses; i++) {
+            spell.castSpell(caster, target);
+        }
+
+        int damage = spell.castSpell(caster, target);
+
+        assertEquals(0, damage, spell.getClass().getSimpleName() + " får inte användas fler gånger än tillåtet");
+    }
+
+    static List<Magic> spellProvider() {
+        return List.of(new FireSpell(), new IceSpell());
     }
 
     @Test
