@@ -1,21 +1,21 @@
 package magic;
 
 import player.Player;
-import race.Dwarf;
 import race.Elf;
+import race.Dwarf;
 
-public class FireSpell implements Magic {
-    private int damage = getBaseDamage();
-    private int numberOfUses = 3;
-
+public class IceSpell implements Magic {
+    int damage = getBaseDamage();
+    private int numberOfUses = 2;
+    @Override
     public String getMagicType() {
-        return "fire";
+        return "ice";
     }
-
-    public int getNumberOfUses() {
+    @Override
+    public int getNumberOfUses(){
         return numberOfUses;
     }
-
+    @Override
     public int castSpell(Player caster, Player target) {
         int modifiedDamage = damage;
 
@@ -26,25 +26,24 @@ public class FireSpell implements Magic {
             //cast spell
         }
         if (target.getRace() instanceof Dwarf) {
-            modifiedDamage = damage - 5;
+            modifiedDamage = damage + 10;
+            numberOfUses--;
 
         }
         if (target.getRace() instanceof Elf) {
-            modifiedDamage = damage + 10;
+            modifiedDamage = damage - 5;
+            numberOfUses--;
         }
-        numberOfUses--;
         return modifiedDamage;
     }
 
+    @Override
     public boolean checkIfAbleToCast() {
-        // if(Om race tillåter det, mana cost, environment etc)
         return true;
     }
 
+    @Override
     public int checkEnvironmentBoost() {
-        //Om du är i gräs område -> damage boost
-        //Om du är i vatten område -> damage decrease
         return 1;
     }
 }
-

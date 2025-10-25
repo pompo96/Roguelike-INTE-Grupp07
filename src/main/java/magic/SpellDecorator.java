@@ -12,6 +12,10 @@ public abstract class SpellDecorator implements Magic {
         return decoratedSpell.getMagicType();
     }
     @Override
+    public int getNumberOfUses(){
+        return decoratedSpell.getNumberOfUses();
+    }
+    @Override
     public int castSpell(Player caster, Player target){
         return decoratedSpell.castSpell(caster, target);
     }
