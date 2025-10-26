@@ -4,9 +4,9 @@ import gameObject.GameObject;
 import player.Player;
 
 public class PlaceholderMob extends GameObject {
-    private int maximumHealth;
+    private final int maximumHealth;
     private int currentHealth;
-    private boolean hostile;
+    private final boolean hostile;
     private Position currentPosition;
     private final Position spawnPoint;
     private final Player player;
