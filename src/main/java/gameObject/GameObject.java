@@ -1,13 +1,12 @@
 package gameObject;
 
-import map.Position;
-
 public abstract class GameObject {
-    protected Position position;
+    protected int y, x;
     private final char objectSymbol;
 
-    protected GameObject(Position position, char objectSymbol) {
-        this.position = position;
+    protected GameObject(int y, int x, char objectSymbol) {
+        this.y = y;
+        this.x = x;
         this.objectSymbol = objectSymbol;
     }
 
