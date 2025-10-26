@@ -28,7 +28,7 @@ public class SimpleFillStrategy implements GenerationStrategy {
         }
 
         Tile entrance = factory.createEntrance(entranceY, entranceX);
-        Tile exit = factory.createExit(exitY, exitX, true);
+        Tile exit = factory.createExit(exitY, exitX);
 
         map.getTileGrid()[entranceY][entranceX] = entrance;
         map.getTileGrid()[exitY][exitX] = exit;

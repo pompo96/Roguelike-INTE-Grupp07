@@ -3,42 +3,46 @@ import java.util.*;
 
 import map.mapGeneration.GenerationStrategy;
 import map.tileFactory.DefaultTileFactory;
-import map.tileFactory.Tile;
+import player.Player;
 
 public class DungeonMapManager {
     private final DefaultTileFactory factory;
     private final Map<Integer, DungeonMap> maps;
-    private DungeonMap currentMap;
-    private int floor;
+    private int currentFloor;
 
     public DungeonMapManager() {
-        this.factory = new DefaultTileFactory();
+        this.factory = new DefaultTileFactory(this);
         this.maps = new HashMap<>();
-        this.floor = 0;
+        this.currentFloor = 0;
     }
 
     public void makeMap(int height, int width, GenerationStrategy strategy) throws IllegalArgumentException {
         if(height < 1 || width < 1) {
             throw new IllegalArgumentException();
         }
-        currentMap = strategy.generate(factory, height, width);
-        floor++;
-        maps.put(floor, currentMap);
+        maps.put(currentFloor, strategy.generate(factory, height, width));
     }
 
     public DungeonMap getMap(){
-        return currentMap;
+        return maps.get(currentFloor);
     }
 
+    public void nextMap(Player player) {
+        if(currentFloor + 1 < maps.size()) {
+            currentFloor++;
+            maps.get(currentFloor).spawnAtEntrance(player);
+            maps.get(currentFloor).drawMap();
 
-    public String drawMap() {
-        StringBuilder sb = new StringBuilder();
-        for(Tile[] row : currentMap.getTileGrid()){
-            for(Tile tile : row){
-                sb.append(tile.toString());
-            }
-            sb.append("\n");
         }
-        return sb.toString();
+        //victory
+    }
+
+    public void priorMap(Player player) {
+        if(currentFloor > 0) {
+            currentFloor--;
+            maps.get(currentFloor).spawnAtExit(player);
+            maps.get(currentFloor).drawMap();
+        }
+        //player.updateCurrentLife(0);
     }
 }

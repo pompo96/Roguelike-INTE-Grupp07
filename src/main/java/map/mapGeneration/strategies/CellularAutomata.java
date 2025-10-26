@@ -73,7 +73,7 @@ public class CellularAutomata implements GenerationStrategy {
         }
 
         map.getTileGrid()[entranceY][entranceX] = factory.createEntrance(entranceY, entranceX);
-        map.getTileGrid()[exitY][exitX] = factory.createExit(exitY, exitX, true);
+        map.getTileGrid()[exitY][exitX] = factory.createExit(exitY, exitX);
     }
 
     private int countWallNeighbors(Tile[][] grid, int x, int y) {
