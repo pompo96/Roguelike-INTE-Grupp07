@@ -1,5 +1,7 @@
 package map;
 
+import map.tileFactory.Tile;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,6 +10,7 @@ public class WalkablePathFinder {
     private final DungeonMap map;
     private final Coordinate start;
     private final Coordinate end;
+
 
     public WalkablePathFinder(DungeonMap map, char startSymbol, char endSymbol) {
         this.map = Objects.requireNonNull(map);
@@ -18,6 +21,15 @@ public class WalkablePathFinder {
     public boolean pathExists() {
         boolean[][] visited = new boolean[map.getHeight()][map.getWidth()];
         return depthFirstSearch(start, end, visited);
+    }
+
+    public int[] getWalkableTile(Tile tile) {
+        List<Coordinate> cordList = walkableNeighbors(new Coordinate(tile.getY(), tile.getX()));
+        int[] neighbourCoords = new int[2];
+        neighbourCoords[0] = cordList.getFirst().y();
+        neighbourCoords[1] = cordList.getFirst().x();
+
+        return neighbourCoords;
     }
 
     private boolean depthFirstSearch(Coordinate current, Coordinate target, boolean[][] visited) {
