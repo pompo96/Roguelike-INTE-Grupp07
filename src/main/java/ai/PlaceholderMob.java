@@ -9,14 +9,13 @@ public class PlaceholderMob extends GameObject {
     private final boolean hostile;
     private Position currentPosition;
     private final Position spawnPoint;
-    private final Player player;
 
-    public PlaceholderMob(Position position, char objectSymbol, int maximumHealth, boolean hostile, Player player){
+
+    public PlaceholderMob(Position position, char objectSymbol, int maximumHealth, boolean hostile){
         super(position.y, position.x, objectSymbol);
         this.maximumHealth = maximumHealth;
         this.currentHealth = maximumHealth;
         this.hostile = hostile;
-        this.player = player;
         currentPosition = new Position(position.x, position.y);
         spawnPoint = new Position(position.x, position.y);
     }
