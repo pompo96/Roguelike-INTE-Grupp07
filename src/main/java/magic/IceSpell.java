@@ -5,7 +5,6 @@ import race.Elf;
 import race.Dwarf;
 
 public class IceSpell implements Magic {
-    int damage = getBaseDamage();
     private int numberOfUses = 2;
 
     @Override

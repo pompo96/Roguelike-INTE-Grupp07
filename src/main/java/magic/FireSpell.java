@@ -5,7 +5,6 @@ import race.Elf;
 import spell.Spell;
 
 public class FireSpell implements Magic {
-    private int damage = getBaseDamage();
     private int numberOfUses = 3;
 
     @Override
@@ -20,7 +19,6 @@ public class FireSpell implements Magic {
 
     @Override
     public int castSpell(Player caster, Player target) {
-        int modifiedDamage = damage;
         DamageCalculator calculatedDamage = new DamageCalculator();
         accept(calculatedDamage, caster, target);
 
