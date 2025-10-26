@@ -4,27 +4,38 @@ import player.Player;
 
 public abstract class SpellDecorator implements Magic {
     protected Magic decoratedSpell;
-    public SpellDecorator(Magic decoratedSpell){
+
+    public SpellDecorator(Magic decoratedSpell) {
         this.decoratedSpell = decoratedSpell;
     }
+
     @Override
-    public String getMagicType(){
+    public String getMagicType() {
         return decoratedSpell.getMagicType();
     }
+
     @Override
-    public int getNumberOfUses(){
+    public int getNumberOfUses() {
         return decoratedSpell.getNumberOfUses();
     }
+
     @Override
-    public int castSpell(Player caster, Player target){
+    public int castSpell(Player caster, Player target) {
         return decoratedSpell.castSpell(caster, target);
     }
+
     @Override
-    public boolean checkIfAbleToCast(){
+    public void accept(SpellVisitor visitor, Player caster, Player target) {
+        decoratedSpell.accept(visitor, caster, target);
+    }
+
+    @Override
+    public boolean checkIfAbleToCast() {
         return decoratedSpell.checkIfAbleToCast();
     }
+
     @Override
-    public int checkEnvironmentBoost(){
+    public int checkEnvironmentBoost() {
         return decoratedSpell.checkEnvironmentBoost();
     }
 }

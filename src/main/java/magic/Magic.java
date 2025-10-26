@@ -7,6 +7,7 @@ public interface Magic {
     String getMagicType();
     int getNumberOfUses();
     int castSpell(Player caster, Player target);
+    void accept(SpellVisitor visitor, Player caster, Player target);
     boolean checkIfAbleToCast();
     int checkEnvironmentBoost();
     default String toStringDescription() {

@@ -2,6 +2,7 @@ package magic;
 import player.Player;
 import race.Dwarf;
 import race.Elf;
+import spell.Spell;
 
 public class FireSpell implements Magic {
     private int damage = getBaseDamage();
@@ -20,24 +21,19 @@ public class FireSpell implements Magic {
     @Override
     public int castSpell(Player caster, Player target) {
         int modifiedDamage = damage;
+        DamageCalculator calculatedDamage = new DamageCalculator();
+        accept(calculatedDamage, caster, target);
 
         if (getNumberOfUses() == 0) {
             return 0;
         }
-        if (checkIfAbleToCast()) {
-            //cast spell
-        }
-        if (target.getRace() instanceof Dwarf) {
-            modifiedDamage = damage - 5;
-
-        }
-        if (target.getRace() instanceof Elf) {
-            modifiedDamage = damage + 10;
-        }
         numberOfUses--;
-        return modifiedDamage;
+        return calculatedDamage.getCalculatedDamage();
     }
-
+    @Override
+    public void accept(SpellVisitor visitor, Player caster, Player target){
+        visitor.visit(this, caster, target);
+    }
     @Override
     public boolean checkIfAbleToCast() {
         // if(Om race tillåter det, mana cost, environment etc)

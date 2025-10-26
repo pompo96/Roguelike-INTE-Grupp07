@@ -20,23 +20,14 @@ public class IceSpell implements Magic {
 
     @Override
     public int castSpell(Player caster, Player target) {
-        int modifiedDamage = damage;
-
         if (getNumberOfUses() == 0) {
             return 0;
         }
-        if (checkIfAbleToCast()) {
-            //cast spell
-        }
-        if (target.getRace() instanceof Dwarf) {
-            modifiedDamage = damage + 10;
+        DamageCalculator calculator = new DamageCalculator();
+        accept(calculator, caster, target);
 
-        }
-        if (target.getRace() instanceof Elf) {
-            modifiedDamage = damage - 5;
-        }
         numberOfUses--;
-        return modifiedDamage;
+        return calculator.getCalculatedDamage();
     }
 
     @Override
@@ -48,7 +39,10 @@ public class IceSpell implements Magic {
     public int checkEnvironmentBoost() {
         return 1;
     }
-
+    @Override
+    public void accept(SpellVisitor visitor, Player caster, Player target){
+        visitor.visit(this, caster, target);
+    }
     @Override
     public String toString() {
         return toStringDescription();
