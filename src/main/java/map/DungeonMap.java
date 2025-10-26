@@ -1,8 +1,12 @@
 package map;
 
 import map.tileFactory.Tile;
+import player.Player;
 
-public class DungeonMap {
+import java.util.ArrayList;
+import java.util.List;
+
+public class    DungeonMap {
     private Tile[][] map;
     private Tile entrance;
     private Tile exit;
@@ -42,4 +46,31 @@ public class DungeonMap {
     public void setExit(Tile exit) {
         this.exit = exit;
     }
+
+    public void drawMap() {
+        StringBuilder sb = new StringBuilder();
+        for(Tile[] row : map){
+            for(Tile tile : row){
+                sb.append(tile.toString());
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb);
+    }
+
+    public void spawnAtEntrance(Player player) {
+        Tile tile = getFirstWalkableNeighbour(entrance);
+        tile.setTileContainer(player);
+    }
+    public void spawnAtExit(Player player) {
+        Tile tile = getFirstWalkableNeighbour(exit);
+        tile.setTileContainer(player);
+    }
+
+    private Tile getFirstWalkableNeighbour(Tile tile){
+        WalkablePathFinder pathFinder = new WalkablePathFinder(this, 'x', 'x');
+        int[] neighbourCoords = pathFinder.getWalkableTile(tile);
+        return map[neighbourCoords[0]][neighbourCoords[1]];
+    }
+
 }

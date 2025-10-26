@@ -94,7 +94,8 @@ public class DungeonMapManagerTest {
         WalkablePathFinder pathFinder = new WalkablePathFinder(map, START_SYMBOL, END_SYMBOL);
 
         boolean exists = pathFinder.pathExists();
-        dungeonMapManager.drawMap();
+        dungeonMapManager.getMap().drawMap(); //todo remove
+
         assertTrue(exists);
     }
 
