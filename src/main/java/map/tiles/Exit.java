@@ -2,12 +2,11 @@ package map.tiles;
 
 import gameObject.GameObject;
 import map.DungeonMapManager;
-import map.tileFactory.Tile;
 import player.Player;
 
 public class Exit extends Tile {
     private int movementModifier = 0;
-    private DungeonMapManager dungeonMapManager;
+    private final DungeonMapManager dungeonMapManager;
     public Exit(int y, int x, DungeonMapManager dungeonMapManager) {
         super(y, x, true, 'E');
         this.dungeonMapManager = dungeonMapManager;
@@ -24,7 +23,7 @@ public class Exit extends Tile {
     @Override
     public void setTileContainer(GameObject object){
         if(object instanceof Player){
-            dungeonMapManager.nextMap((Player) object);
+            dungeonMapManager.nextMap();
         }
     }
 }

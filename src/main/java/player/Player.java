@@ -27,8 +27,8 @@ public class Player extends GameObject {
     private Map<String, Object> questItems;
 
 
-    public Player(Race race, Map<String, Item> defaultItems, int y, int x, char symbol, String name) {
-        super(y,x, symbol);
+    public Player(Race race, Map<String, Item> defaultItems, char symbol, String name) {
+        super(0,0, symbol);
         this.race = race;
         this.maxLife = DEFAULT_LIFE + race.getLifeModifier();
         this.currentLife = this.maxLife;
@@ -93,6 +93,7 @@ public class Player extends GameObject {
         if(!items.containsKey(item.getName())){
             return;
         }
+
         switch(item.getName()){
             case "weapon":
                 equipWeapon(item);

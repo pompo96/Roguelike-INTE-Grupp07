@@ -1,6 +1,7 @@
-package map;
+package map.pathfinding;
 
-import map.tileFactory.Tile;
+import map.DungeonMap;
+import map.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,8 @@ public class WalkablePathFinder {
     public int[] getWalkableTile(Tile tile) {
         List<Coordinate> cordList = walkableNeighbors(new Coordinate(tile.getY(), tile.getX()));
         int[] neighbourCoords = new int[2];
-        neighbourCoords[0] = cordList.getFirst().y();
-        neighbourCoords[1] = cordList.getFirst().x();
+        neighbourCoords[0] = cordList.getFirst().column();
+        neighbourCoords[1] = cordList.getFirst().row();
 
         return neighbourCoords;
     }
@@ -37,10 +38,10 @@ public class WalkablePathFinder {
             return true;
         }
 
-        visited[current.y()][current.x()] = true;
+        visited[current.column()][current.row()] = true;
 
         for (Coordinate neighbor : walkableNeighbors(current)) {
-            if (!visited[neighbor.y()][neighbor.x()] && depthFirstSearch(neighbor, target, visited)) {
+            if (!visited[neighbor.column()][neighbor.row()] && depthFirstSearch(neighbor, target, visited)) {
                 return true;
             }
         }
@@ -49,9 +50,9 @@ public class WalkablePathFinder {
 
     private List<Coordinate> walkableNeighbors(Coordinate position) {
         List<Coordinate> neighbors = new ArrayList<>();
-        for (Direction direction : Direction.values()) {
-            Coordinate next = position.move(direction);
-            if (isWithinBounds(next) && map.getTileGrid()[next.y()][next.x()].isWalkable()) {
+        for (Directions directions : Directions.values()) {
+            Coordinate next = position.move(directions);
+            if (isWithinBounds(next) && map.getTileGrid()[next.column()][next.row()].isWalkable()) {
                 neighbors.add(next);
             }
         }
@@ -59,52 +60,25 @@ public class WalkablePathFinder {
     }
 
     private boolean isWithinBounds(Coordinate coordinate) {
-        return coordinate.y() >= 0 && coordinate.y() < map.getHeight() &&
-                coordinate.x() >= 0 && coordinate.x() < map.getWidth();
+        return coordinate.column() >= 0 && coordinate.column() < map.getHeight() &&
+                coordinate.row() >= 0 && coordinate.row() < map.getWidth();
     }
 
     private Coordinate findSymbolCoordinate(char symbol) {
-        for (int y = 0; y < map.getHeight(); y++) {
-            for (int x = 0; x < map.getWidth(); x++) {
-                if (map.getTileGrid()[y][x].getObjectSymbol() == symbol) {
-                    return new Coordinate(x, y);
+        for (int column = 0; column < map.getHeight(); column++) {
+            for (int row = 0; row < map.getWidth(); row++) {
+                if (map.getTileGrid()[column][row].getObjectSymbol() == symbol) {
+                    return new Coordinate(column, row);
                 }
             }
         }
         throw new IllegalArgumentException("Symbol '" + symbol + "' not found in map.");
     }
 
-    private record Coordinate(int x, int y) {
+    private record Coordinate(int column, int row) {
 
-        public Coordinate move(Direction direction) {
-            return new Coordinate(x + direction.dx(), y + direction.dy());
-        }
-    }
-
-    private enum Direction {
-        RIGHT(1, 0),
-        LEFT(-1, 0),
-        DOWN(0, 1),
-        DOWNLEFT(-1, 1),
-        DOWNRIGHT(1,1),
-        UP(0, -1),
-        UPLEFT(-1,-1),
-        UPRIGHT(1, -1);
-
-        private final int dx;
-        private final int dy;
-
-        Direction(int dx, int dy) {
-            this.dx = dx;
-            this.dy = dy;
-        }
-
-        public int dx() {
-            return dx;
-        }
-
-        public int dy() {
-            return dy;
+        public Coordinate move(Directions directions) {
+            return new Coordinate(column + directions.getColumn(), row + directions.getRow());
         }
     }
 }

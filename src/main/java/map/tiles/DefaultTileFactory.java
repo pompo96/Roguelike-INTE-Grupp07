@@ -1,8 +1,6 @@
-package map.tileFactory;
+package map.tiles;
 
-import map.DungeonMap;
 import map.DungeonMapManager;
-import map.tiles.*;
 
 public class DefaultTileFactory implements TileFactory {
         DungeonMapManager mapManager;
@@ -20,5 +18,4 @@ public class DefaultTileFactory implements TileFactory {
         public Tile createExit(int y, int x) {
                 return new Exit(y, x, this.mapManager);
         }
-        public Tile createTestTile(int y, int x) { return new TestTile(y, x); }
 }

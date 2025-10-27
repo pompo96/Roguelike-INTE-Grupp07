@@ -1,371 +1,245 @@
 package player;
+
+import equipment.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import race.Race;
-import equipment.Item;
+import testutils.MockFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-/**
- * Spelare attribut
- * currentLife
- * maxLife (default += raceModifier)
- * //100 liv, base movement, inga koordinater, inget equipped gear, inget yrke, behöver och ras
- * Race (Race objekt)
- * Story progress map (questname -> completed(boolean))
- * Movement speed (deault += raceModifier)
- * Koordinater ??
- * Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
- * Questlog list(questObjects)
- */
-
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class PlayerTests {
-    Player defaultPlayer;
-    Race mockRace;
-    Item mockItemWeapon;
-    Item mockItemChestpiece;
-    Item mockItemBoots;
-    Player.Quest mockQuest1;
-    Player.Quest mockQuest2;
-    //Quest questList;
+
+    private Player mockPlayer;
+    private Player.Quest mockQuest1;
+    private Player.Quest mockQuest2;
 
     @BeforeEach
-    public void initializePlayer(){
-
-
-        //Skapa en quest interface för att använda mock?
-        //mock questList = mock(Quest.class);
-
-        mockRace = mock(Race.class);
-        mockItemWeapon = mock(Item.class);
-        mockItemChestpiece = mock(Item.class);
-        mockItemBoots = mock(Item.class);
-
-        when(mockItemWeapon.getName()).thenReturn("weapon");
-        when(mockItemWeapon.getWeaponDamage()).thenReturn(15);
-
-        when(mockItemChestpiece.getName()).thenReturn("chestpiece");
-        when(mockItemChestpiece.getLifeModifier()).thenReturn(10);
-
-        when(mockItemBoots.getName()).thenReturn("boots");
-        when(mockItemBoots.getMovementModifier()).thenReturn(10);
-
-        when(mockRace.getLifeModifier()).thenReturn(20); // t.ex. +20 HP
-        when(mockRace.getMovementModifier()).thenReturn(2); // t.ex. +2 speed
-        when(mockRace.getAttackPowerModifier()).thenReturn(5);
-        when(mockRace.getName()).thenReturn("human");
-
-        mockQuest1 = mock(Player.Quest.class);
-        when(mockQuest1.getID()).thenReturn("DungeonBeat");
-        when(mockQuest1.getName()).thenReturn("Beat the Dungeon");
-        when(mockQuest1.getDescription()).thenReturn("Defeat all enemies in the dungeon");
-
-        mockQuest2 = mock(Player.Quest.class);
-        when(mockQuest2.getID()).thenReturn("LostAndFound");
-        when(mockQuest2.getName()).thenReturn("Find the Lost Artifact");
-        when(mockQuest2.getDescription()).thenReturn("Search for the artifact in the forest");
-
-        //when(questList.getQuests()).thenReturn([("DungeonBeat", true), ("LostAndFound", false),("Tutorial", true)]);
-// todo fix
-//        defaultPlayer = new Player(mockRace);
+    void setUp() {
+        mockPlayer = MockFactory.createMockPlayer();
+        mockQuest1 = MockFactory.createMockQuest("DungeonBeat", "Beat the Dungeon", "Defeat all enemies in the dungeon");
+        mockQuest2 = MockFactory.createMockQuest("LostAndFound", "Find the Lost Artifact", "Search for the artifact in the forest");
     }
 
+    // --- Life tests ---
+
     @Test
-    public void defaultPlayer_hasDefaultHp(){
-        int totalLife = Player.DEFAULT_LIFE + mockRace.getLifeModifier();
-        assertEquals(totalLife, defaultPlayer.getMaxLife());
+    public void defaultPlayer_hasDefaultHp() {
+        int totalLife = Player.DEFAULT_LIFE + mockPlayer.getRace().getLifeModifier();
+        assertEquals(totalLife, mockPlayer.getMaxLife());
     }
 
     @Test
     public void updateMaxLife_updatesMaxLife() {
         int lifeAdjustment = 10;
-        int defaultLife = Player.DEFAULT_LIFE + mockRace.getLifeModifier();
-        defaultPlayer.updateMaxLife(10);
-
-        assertEquals(defaultLife+lifeAdjustment, defaultPlayer.getMaxLife());
+        int expected = mockPlayer.getMaxLife() + lifeAdjustment;
+        mockPlayer.updateMaxLife(lifeAdjustment);
+        assertEquals(expected, mockPlayer.getMaxLife());
     }
 
     @Test
-    public void defaultPlayer_hasDefaultCurrentLife(){
-        int defaultLife = Player.DEFAULT_LIFE + mockRace.getLifeModifier();
-        assertEquals(defaultLife, defaultPlayer.getCurrentLife());
+    public void defaultPlayer_hasDefaultCurrentLife() {
+        assertEquals(mockPlayer.getMaxLife(), mockPlayer.getCurrentLife());
     }
 
     @Test
-    public void updateCurrentLife_updatesCurrentLife(){
-        int defaultLife = Player.DEFAULT_LIFE + mockRace.getLifeModifier();
-        int lifeAdjustment = -10;
-        defaultPlayer.updateCurrentLife(lifeAdjustment);
-        assertEquals(defaultLife+lifeAdjustment, defaultPlayer.getCurrentLife());
+    public void updateCurrentLife_updatesCurrentLife() {
+        int adjustment = -10;
+        int expected = mockPlayer.getCurrentLife() + adjustment;
+        mockPlayer.updateCurrentLife(adjustment);
+        assertEquals(expected, mockPlayer.getCurrentLife());
     }
 
     @Test
-    public void updateCurrentLife_limitedByMaxLife(){
-        defaultPlayer.updateCurrentLife(10);
-        assertEquals(defaultPlayer.getMaxLife(), defaultPlayer.getCurrentLife());
+    public void updateCurrentLife_limitedByMaxLife() {
+        mockPlayer.updateCurrentLife(9999);
+        assertEquals(mockPlayer.getMaxLife(), mockPlayer.getCurrentLife());
     }
 
+    // --- Movement speed tests ---
 
-    //GPT start
-    // Prompt -> "implement movement speed tests like we implemented life tests"
     @Test
     public void defaultPlayer_hasDefaultMovementSpeed() {
-        int expectedSpeed = Player.DEFAULT_MOVEMENT_SPEED + mockRace.getMovementModifier();
-        assertEquals(expectedSpeed, defaultPlayer.getMovementSpeed());
+        int expected = Player.DEFAULT_MOVEMENT_SPEED + mockPlayer.getRace().getMovementModifier();
+        assertEquals(expected, mockPlayer.getMovementSpeed());
     }
 
     @Test
     public void updateMovementSpeed_increasesSpeed() {
-        int speedAdjustment = 5;
-        int defaultSpeed = Player.DEFAULT_MOVEMENT_SPEED + mockRace.getMovementModifier();
-
-        defaultPlayer.updateMovementSpeed(speedAdjustment);
-
-        assertEquals(defaultSpeed + speedAdjustment, defaultPlayer.getMovementSpeed());
+        int start = mockPlayer.getMovementSpeed();
+        mockPlayer.updateMovementSpeed(5);
+        assertEquals(start + 5, mockPlayer.getMovementSpeed());
     }
 
     @Test
     public void updateMovementSpeed_decreasesSpeed() {
-        int speedAdjustment = -3;
-        int defaultSpeed = Player.DEFAULT_MOVEMENT_SPEED + mockRace.getMovementModifier();
+        int start = mockPlayer.getMovementSpeed();
+        mockPlayer.updateMovementSpeed(-3);
+        assertEquals(start - 3, mockPlayer.getMovementSpeed());
+    }
 
-        defaultPlayer.updateMovementSpeed(speedAdjustment);
-
-        assertEquals(defaultSpeed + speedAdjustment, defaultPlayer.getMovementSpeed());
-    }    //GPT end
+    // --- Attack power tests ---
 
     @Test
-    public void defaultPlayer_hasDefaultAttackPower(){
-        int expectedAttackPower = Player.DEFAULT_ATTACK_POWER + mockRace.getAttackPowerModifier();
-        assertEquals(expectedAttackPower, defaultPlayer.getBaseAttackPower());
+    public void defaultPlayer_hasDefaultAttackPower() {
+        int expected = Player.DEFAULT_ATTACK_POWER + mockPlayer.getRace().getAttackPowerModifier();
+        assertEquals(expected, mockPlayer.getBaseAttackPower());
     }
 
     @Test
-    public void updateAttackPower_increasesBaseAttackPower(){
-        int attackAdjustment = 20;
-        int defaultAttack = Player.DEFAULT_ATTACK_POWER + mockRace.getAttackPowerModifier();
-        defaultPlayer.updateBaseAttackPower(attackAdjustment);
-        assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getBaseAttackPower());
-    }
-    @Test
-    public void updateBaseAttackPower_decreasesBaseAttackPower(){
-        int attackAdjustment = 2;
-        int defaultAttack = Player.DEFAULT_ATTACK_POWER + mockRace.getAttackPowerModifier();
-        defaultPlayer.updateBaseAttackPower(attackAdjustment);
-        assertEquals(defaultAttack + attackAdjustment, defaultPlayer.getBaseAttackPower());
+    public void updateAttackPower_increasesBaseAttackPower() {
+        int base = mockPlayer.getBaseAttackPower();
+        mockPlayer.updateBaseAttackPower(10);
+        assertEquals(base + 10, mockPlayer.getBaseAttackPower());
     }
 
     @Test
-    public void updateBaseAttackPower_cantGoBelowZero(){
-        int currentAttackPower = defaultPlayer.getBaseAttackPower();
-        defaultPlayer.updateBaseAttackPower(-currentAttackPower - 10);
-        assertEquals(0, defaultPlayer.getBaseAttackPower());
+    public void updateBaseAttackPower_cantGoBelowZero() {
+        mockPlayer.updateBaseAttackPower(-9999);
+        assertEquals(0, mockPlayer.getBaseAttackPower());
     }
 
     @Test
-    public void newDefaultCharacter_hasZeroAttackEffectModifier()
-    {
-        assertEquals(0, defaultPlayer.getAttackPowerEffectModifier());
+    public void attackEffectModifier_startsAtZero() {
+        assertEquals(0, mockPlayer.getAttackPowerEffectModifier());
     }
 
     @Test
-    public void updatingAttackEffectModifier_setsAttackEffectModifier(){
-        int effectValue = 2;
-        defaultPlayer.updateAttackPowerEffectModifier(effectValue);
-        assertEquals(effectValue, defaultPlayer.getAttackPowerEffectModifier());
+    public void updatingAttackEffectModifier_setsNewValue() {
+        mockPlayer.updateAttackPowerEffectModifier(3);
+        assertEquals(3, mockPlayer.getAttackPowerEffectModifier());
+    }
+
+    // --- Race getter ---
+
+    @Test
+    public void getRace_returnsRace() {
+        Race race = mockPlayer.getRace();
+        assertNotNull(race);
+        assertEquals("human", race.getName());
+    }
+
+    // --- Equipment tests ---
+
+    @Test
+    public void playerWithStarterItems_hasItems() {
+        Map<String, Item> items = mockPlayer.getItems();
+        assertEquals(3, items.size(), "Player should start with 3 equipped items");
+        assertTrue(items.containsKey("weapon"));
+        assertTrue(items.containsKey("chestpiece"));
+        assertTrue(items.containsKey("boots"));
     }
 
     @Test
-    public  void updatingAttackEffectModifier_overridesPreviousValue(){
-        int firstEffectValue = 3;
-        int secondEffectValue = -4;
-        defaultPlayer.updateAttackPowerEffectModifier(firstEffectValue);
-        defaultPlayer.updateAttackPowerEffectModifier(secondEffectValue);
-        assertEquals(secondEffectValue, defaultPlayer.getAttackPowerEffectModifier());
-    }
-
-    // Race (Race objekt)
-    // getter for race
-    //
-    @Test
-    public void getRace_returnsRace(){
-        Race race = defaultPlayer.getRace();
-        assertEquals(mockRace, race);
-    }
-
-    // Story progress map (questname -> completed(boolean))
-
-    @Test
-    public void completedQuest_returnsTrue(){
-        boolean result = true; //defaultPlayer.isQuestCompleted(questID);
-        assertTrue(result, "Quest has not been completed.");
+    public void equippingWeapon_updatesWeaponSlot() {
+        Item newWeapon = MockFactory.createMockWeapon("weapon", 10);
+        mockPlayer.equipItem(newWeapon);
+        assertEquals(newWeapon, mockPlayer.getItems().get("weapon"));
     }
 
     @Test
-    public void completedQuest_returnsFalse(){
-        boolean result = false; //defaultPlayer.isQuestCompleted(questID);
-        assertFalse(result, "Quest has been completed.");
+    public void equippingChestpiece_updatesLife() {
+        int before = mockPlayer.getMaxLife();
+        Item newChest = MockFactory.createMockChestpiece("chestpiece", 10);
+        mockPlayer.equipItem(newChest);
+        int expected = before + newChest.getLifeModifier();
+        assertEquals(expected, mockPlayer.getMaxLife());
     }
 
     @Test
-    public void questIsNotStarted(){
-        boolean result = false;//defaultPlayer.isQuestStarted(questID);
-        assertFalse(result, "Quest has started");
+    public void equippingBoots_updatesMovementSpeed() {
+        int before = mockPlayer.getMovementSpeed();
+        Item newBoots = MockFactory.createMockBoots("boots", 10);
+        mockPlayer.equipItem(newBoots);
+        int expected = before + newBoots.getMovementModifier();
+        assertEquals(expected, mockPlayer.getMovementSpeed());
     }
 
-    @Test
-    public void questIsStarted(){
-        boolean result = true; //defaultPlayer.isQuestStarted(questID);
-        assertTrue(result, "Quest has not started");
-    }
-
-    @Test
-    public void addQuest(){
-
-    }
-
-    // Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
-    //ska ta en map där vapen,armour,boots är tom
-    // todo player ska ha en default item list
-//    @Test
-//    public void defaultPlayerHasNoItems(){
-//        assertEquals("", defaultPlayer.getItems(), "Player har items");
-//    }
-
-    @Test
-    public void playerWithStarterItems_hasItems(){
-        Map<String, Item> items = new HashMap<>();
-        items.put("weapon", mockItemWeapon);
-        items.put("chestpiece", mockItemChestpiece);
-        items.put("boots", mockItemBoots);
-        int sizeOfMap = items.size();
-        Player player = new Player(mockRace, items, 0,0, 'P', "playa");
-        assertEquals(player.getItems().size(), sizeOfMap, "getItems metoden returnerar för många nyckelvärden");
-        assertEquals(player.getItems().get("helmet"), items.get("helmet"), "Det är inte en helmet");
-        assertEquals(player.getItems().get("chestpiece"), items.get("chestpiece"), "Det är inte en chestpiece");
-        assertEquals(player.getItems().get("boot"), items.get("boot"), "Det är int en boot");
-    }
-
-    @Test
-    public void equipItem_properlyEquipsItem(){
-        defaultPlayer.equipItem(mockItemWeapon);
-        Map<String, Item> items = defaultPlayer.getItems();
-        assertEquals(items.get("weapon"), mockItemWeapon);
-    }
-
-    //equipitems test + player metod se till att life/movement speed updateras korrekt
-    @Test
-    public void equippingWeapon_updatesWeapon(){
-        defaultPlayer.equipItem(mockItemWeapon);
-        Map<String, Item> items = defaultPlayer.getItems();
-        Item weapon = items.get(mockItemWeapon.getName());
-        assertEquals(weapon, mockItemWeapon);
-    }
-
-    @Test
-    public void equippingChest_updatesLife(){
-        int baseLife = defaultPlayer.getMaxLife();
-        defaultPlayer.equipItem(mockItemChestpiece);
-        int newLife = baseLife + mockItemChestpiece.getLifeModifier();
-
-        assertEquals(newLife, defaultPlayer.getMaxLife());
-
-    }
-
-    @Test
-    public void equippingBoots_updatesMovementSpeed(){
-        int baseMovementSpeed = defaultPlayer.getMovementSpeed();
-        defaultPlayer.equipItem(mockItemBoots);
-        int newMovementSpeed = baseMovementSpeed + mockItemBoots.getMovementModifier();
-
-        assertEquals(newMovementSpeed, defaultPlayer.getMovementSpeed());
-    }
-
+    // --- Quest log tests ---
     @Test
     public void questLog_startsClosedByDefault() {
-        assertFalse(defaultPlayer.isQuestLogOpen(), "QuestLog borde vara stängd från början");
+        assertFalse(mockPlayer.isQuestLogOpen());
     }
 
     @Test
     public void openQuestLog_opensTheLog() {
-        defaultPlayer.openQuestLog();
-        assertTrue(defaultPlayer.isQuestLogOpen(), "QuestLog borde vara öppen");
+        mockPlayer.openQuestLog();
+        assertTrue(mockPlayer.isQuestLogOpen());
     }
 
     @Test
     public void closeQuestLog_closesTheLog() {
-        defaultPlayer.openQuestLog();
-        defaultPlayer.closeQuestLog();
-        assertFalse(defaultPlayer.isQuestLogOpen(), "QuestLog borde vara stängd");
+        mockPlayer.openQuestLog();
+        mockPlayer.closeQuestLog();
+        assertFalse(mockPlayer.isQuestLogOpen());
     }
 
     @Test
     public void acceptQuest_addsQuestToLog() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        assertEquals(1, defaultPlayer.getQuestCount(), "QuestLog borde innehålla 1 quest");
+        mockPlayer.acceptQuest(mockQuest1);
+        assertEquals(1, mockPlayer.getQuestCount());
     }
 
     @Test
     public void acceptMultipleQuests_addsAllQuests() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        defaultPlayer.acceptQuest(mockQuest2);
-        assertEquals(2, defaultPlayer.getQuestCount(), "QuestLog borde innehålla 2 quests");
+        mockPlayer.acceptQuest(mockQuest1);
+        mockPlayer.acceptQuest(mockQuest2);
+        assertEquals(2, mockPlayer.getQuestCount());
     }
 
     @Test
     public void acceptDuplicateQuest_doesNotAddDuplicate() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        defaultPlayer.acceptQuest(mockQuest1);
-        assertEquals(1, defaultPlayer.getQuestCount(), "QuestLog borde inte ha dubbletter");
+        mockPlayer.acceptQuest(mockQuest1);
+        mockPlayer.acceptQuest(mockQuest1);
+        assertEquals(1, mockPlayer.getQuestCount());
     }
 
     @Test
     public void getActiveQuests_returnsAllQuests() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        defaultPlayer.acceptQuest(mockQuest2);
-        List<Player.Quest> quests = defaultPlayer.getActiveQuests();
-        assertEquals(2, quests.size(), "Borde returnera 2 quests");
+        mockPlayer.acceptQuest(mockQuest1);
+        mockPlayer.acceptQuest(mockQuest2);
+        List<Player.Quest> quests = mockPlayer.getActiveQuests();
+        assertEquals(2, quests.size());
     }
 
     @Test
     public void getQuest_returnsQuestByID() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        Player.Quest foundQuest = defaultPlayer.getQuest("DungeonBeat");
-        assertEquals(mockQuest1, foundQuest, "Borde hitta rätt quest");
+        mockPlayer.acceptQuest(mockQuest1);
+        Player.Quest found = mockPlayer.getQuest("DungeonBeat");
+        assertEquals(mockQuest1, found);
     }
 
     @Test
     public void getQuest_returnsNullIfNotFound() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        Player.Quest foundQuest = defaultPlayer.getQuest("NonExistent");
-        assertNull(foundQuest, "Borde returnera null för icke existerande quest");
+        mockPlayer.acceptQuest(mockQuest1);
+        Player.Quest found = mockPlayer.getQuest("Nonexistent");
+        assertNull(found);
     }
 
     @Test
     public void abandonQuest_removesQuestFromLog() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        defaultPlayer.acceptQuest(mockQuest2);
-        defaultPlayer.abandonQuest(mockQuest1);
-        assertEquals(1, defaultPlayer.getQuestCount(), "QuestLog borde innehålla 1 quest efter abandon");
+        mockPlayer.acceptQuest(mockQuest1);
+        mockPlayer.acceptQuest(mockQuest2);
+        mockPlayer.abandonQuest(mockQuest1);
+        assertEquals(1, mockPlayer.getQuestCount());
     }
 
     @Test
     public void abandonQuest_correctQuestRemoved() {
-        defaultPlayer.acceptQuest(mockQuest1);
-        defaultPlayer.acceptQuest(mockQuest2);
-        defaultPlayer.abandonQuest(mockQuest1);
-
-        Player.Quest remaining = defaultPlayer.getQuest("LostAndFound");
-        assertEquals(mockQuest2, remaining, "LostAndFound borde fortfarande vara i loggen");
+        mockPlayer.acceptQuest(mockQuest1);
+        mockPlayer.acceptQuest(mockQuest2);
+        mockPlayer.abandonQuest(mockQuest1);
+        Player.Quest remaining = mockPlayer.getQuest("LostAndFound");
+        assertEquals(mockQuest2, remaining);
     }
-
-
-
-    // Questlog list(questObjects) // Yousef
-
 }

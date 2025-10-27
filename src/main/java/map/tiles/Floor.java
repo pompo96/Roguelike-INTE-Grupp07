@@ -1,8 +1,5 @@
 package map.tiles;
 
-import gameObject.GameObject;
-import map.tileFactory.Tile;
-
 public class Floor extends Tile {
     private int movementModifier = 0;
 

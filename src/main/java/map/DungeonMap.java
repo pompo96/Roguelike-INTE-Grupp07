@@ -1,10 +1,11 @@
 package map;
 
-import map.tileFactory.Tile;
+import equipment.Item;
+import gameObject.GameObject;
+import map.pathfinding.Directions;
+import map.pathfinding.WalkablePathFinder;
+import map.tiles.Tile;
 import player.Player;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class    DungeonMap {
     private Tile[][] map;
@@ -47,7 +48,7 @@ public class    DungeonMap {
         this.exit = exit;
     }
 
-    public void drawMap() {
+    public void drawMap() { //test -
         StringBuilder sb = new StringBuilder();
         for(Tile[] row : map){
             for(Tile tile : row){
@@ -58,13 +59,23 @@ public class    DungeonMap {
         System.out.println(sb);
     }
 
-    public void spawnAtEntrance(Player player) {
+    public void spawnAtLocation(int y, int x, GameObject gameObject){ //test +
+        map[y][x].setTileContainer(gameObject);
+        gameObject.setY(y);
+        gameObject.setX(x);
+    }
+
+    public void spawnPlayerAtEntrance(Player player) { //test -
         Tile tile = getFirstWalkableNeighbour(entrance);
         tile.setTileContainer(player);
+        player.setY(tile.getY());
+        player.setX(tile.getX());
     }
-    public void spawnAtExit(Player player) {
+    public void spawnPlayerAtExit(Player player) { //test -
         Tile tile = getFirstWalkableNeighbour(exit);
         tile.setTileContainer(player);
+        player.setY(tile.getY());
+        player.setX(tile.getX());
     }
 
     private Tile getFirstWalkableNeighbour(Tile tile){
@@ -72,5 +83,38 @@ public class    DungeonMap {
         int[] neighbourCoords = pathFinder.getWalkableTile(tile);
         return map[neighbourCoords[0]][neighbourCoords[1]];
     }
+
+    public boolean movePlayer(Directions dir, Player player) {
+        if (player == null) return false;
+
+        int oldY = player.getY();
+        int oldX = player.getX();
+
+        int newY = oldY + dir.getRow();
+        int newX = oldX + dir.getColumn();
+
+        if (newY < 0 || newY >= getHeight() || newX < 0 || newX >= getWidth()) {
+            return false;
+        }
+
+        Tile targetTile = map[newY][newX];
+
+        if (!targetTile.isWalkable()) {
+            return false;
+        }
+
+        if(targetTile.getTileContainer() instanceof Item){
+            player.equipItem((Item) targetTile.getTileContainer());
+        }
+
+        Tile oldTile = map[oldY][oldX];
+        oldTile.clearTileContainer();
+        targetTile.setTileContainer(player);
+        player.setY(newY);
+        player.setX(newX);
+
+        return true;
+    }
+
 
 }

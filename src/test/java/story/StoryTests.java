@@ -34,7 +34,7 @@ public class StoryTests {
         npcXerxes = new Story.NPC("Xerxes", questDungeonBeat, null);
         npcCyrus = new Story.NPC("Cyrus", questLostAndFound, "DoransRing");
 
-        player = new Player(mockRace);
+//        player = new Player(mockRace);
     }
 
 

@@ -1,7 +1,6 @@
-package map.mapGeneration;
+package map.generation;
 import map.DungeonMap;
-import map.tileFactory.Tile;
-import map.tileFactory.TileFactory;
+import map.tiles.TileFactory;
 
 public interface GenerationStrategy {
     /**

@@ -1,10 +1,9 @@
-package map.mapGeneration.strategies;
+package map.generation;
 
 import map.DungeonMap;
-import map.WalkablePathFinder;
-import map.mapGeneration.GenerationStrategy;
-import map.tileFactory.Tile;
-import map.tileFactory.TileFactory;
+import map.pathfinding.WalkablePathFinder;
+import map.tiles.Tile;
+import map.tiles.TileFactory;
 
 import java.util.Random;
 

@@ -1,9 +1,9 @@
-package map.tileFactory;
+package map.tiles;
 
 import gameObject.GameObject;
 
 public abstract class Tile extends GameObject {
-    private int x,y;
+
     private final boolean isWalkable;
     private GameObject tileContainer;
 
@@ -20,20 +20,8 @@ public abstract class Tile extends GameObject {
         return tileContainer;
     }
 
-
-    public int getX() {
-        return x;
+    public void clearTileContainer() {
+        tileContainer = null;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
 }

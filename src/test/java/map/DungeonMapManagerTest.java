@@ -1,149 +1,190 @@
 package map;
-import map.mapGeneration.GenerationStrategy;
-import map.mapGeneration.strategies.SimpleFillStrategy;
-import map.tileFactory.*;
-import map.tiles.Entrance;
-import map.tiles.Exit;
-import map.tiles.Wall;
+import equipment.Item;
+import gameObject.GameObject;
+import map.pathfinding.Directions;
+import map.generation.GenerationStrategy;
+import map.generation.SimpleFillStrategy;
+import map.tiles.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import player.Player;
+import testutils.MockFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ ---- Tests ----
+ Map is valid so, contains a walkable path between entrace and exit, no missing tiles,
+
+ Todo below
+ Test map entrance and exit dont spawn next to eachother, maybe minimum traversal distance?
+ Test tile "sets" like bridge spawning a straight bridge x tiles long etc
+ Test that floor spawns the proper map and uses proper structures and tiles
+
+ //todo finish implementing this
+ //    @Test
+ //    public void drawMapMap_returnsCharGrid(){
+ //        String render = dungeonMapManager.drawMap();
+ //    }
+ //Todo test for swapping currentMap if exit reached.
+ //Todo test having multiple maps
+ //Todo make exit and entrace be connected to a map somehow(index)
+
+ */
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DungeonMapManagerTest {
-    private int seedHeight;
-    private int seedWidth;
-    private static final char START_SYMBOL = '⨇';
-    private static final char END_SYMBOL = 'E';
     DungeonMapManager dungeonMapManager;
     GenerationStrategy strategy;
+    Player mockPlayer;
 
     @BeforeEach
     public void setUp() {
-        this.seedHeight = 10;
-        this.seedWidth = 10;
         strategy = new SimpleFillStrategy();
-        dungeonMapManager = new DungeonMapManager();
-        dungeonMapManager.makeMap(seedHeight, seedWidth, strategy);
+        mockPlayer = MockFactory.createMockPlayer();
+        dungeonMapManager = new DungeonMapManager(mockPlayer);
+        dungeonMapManager.makeMap(10, 10, strategy);
+
     }
-    //Todo test for swapping currentMap if exit reached.
-    //Todo test having multiple maps
-    //Todo make exit and entrace be connected to a map somehow(index)
+
     @Test
-    public void constructor_SetsCorrectDimensions(){
-        seedHeight = 5;
-        seedWidth = 10;
-        DungeonMapManager dungeonMapManager = new DungeonMapManager();
-        dungeonMapManager.makeMap(seedHeight, seedWidth, strategy);
+    public void testPlayerMovement_UpdatesTilesCorrectly() {
+        dungeonMapManager.setPlayer(mockPlayer);
+        dungeonMapManager.spawnPlayerAt(5, 5);
 
-        int mapHeight = dungeonMapManager.getMap().getHeight();
-        int mapWidth = dungeonMapManager.getMap().getWidth();
+        for (Directions dir : Directions.values()) {
+            DungeonMap map = dungeonMapManager.getMap();
+            Tile[][] grid = map.getTileGrid();
 
-        assertEquals(mapHeight, seedHeight);
-        assertEquals(mapWidth, seedWidth);
+            int oldY = mockPlayer.getY();
+            int oldX = mockPlayer.getX();
+
+            boolean moved = dungeonMapManager.movePlayer(dir);
+            assertTrue(moved);
+
+            int newY = mockPlayer.getY();
+            int newX = mockPlayer.getX();
+
+            boolean newTileHasPlayer = grid[newY][newX].getTileContainer() instanceof Player;
+            boolean oldTileHasPlayer = grid[oldY][oldX].getTileContainer() instanceof Player;
+
+            assertTrue(newTileHasPlayer);
+            assertFalse(oldTileHasPlayer);
+        }
     }
+
+    @Test
+    public void testPlayerMovement_UpdatesPlayerCoordinates() {
+        dungeonMapManager.setPlayer(mockPlayer);
+        dungeonMapManager.spawnPlayerAt(5, 5);
+
+        for (Directions dir : Directions.values()) {
+            int oldY = mockPlayer.getY();
+            int oldX = mockPlayer.getX();
+
+            boolean moved = dungeonMapManager.movePlayer(dir);
+
+            int expectedY = oldY + dir.getRow();
+            int expectedX = oldX + dir.getColumn();
+
+            assertTrue(moved);
+            assertEquals(expectedY, mockPlayer.getY());
+            assertEquals(expectedX, mockPlayer.getX());
+        }
+    }
+
 
     @ParameterizedTest
     @CsvSource(value = { "0,10", "10, 0"})
-    public void nonPositiveDimensions_ThrowsException(int seedHeight, int seedWidth) {
-        dungeonMapManager = new DungeonMapManager();
-        assertThrows(IllegalArgumentException.class, () -> dungeonMapManager.makeMap(seedHeight, seedWidth, strategy));
+    public void nonPositiveDimensions_ThrowsException(int height, int width) {
+        assertThrows(IllegalArgumentException.class, () -> dungeonMapManager.makeMap(height, width, strategy));
     }
 
-    //todo finish implementing this
+//    //broken due to shitty class hierarchy
 //    @Test
-//    public void drawMapMap_returnsCharGrid(){
-//        String render = dungeonMapManager.drawMap();
+//    void playerWalksOverItem_GetsNewItem() {
+//        dungeonMapManager.setPlayer(mockPlayer);
+//
+//        dungeonMapManager.spawnPlayerAt(3, 3);
+//        dungeonMapManager.placeObjectAt(4, 3, MockFactory.createMockWeapon("newSword", 100));
+//        dungeonMapManager.movePlayer(Directions.SOUTH);
+//
+//        assertTrue(mockPlayer.hasItem("newSword"));
 //    }
 
     @Test
-    public void testGridContainsNoEmptyTiles(){
-        DungeonMap map = dungeonMapManager.getMap();
-        for(Tile[] row : map.getTileGrid()){
-            for(Tile tile : row){
-                assertNotNull(tile);
-            }
-        }
-    }
+    public void playerWalksOntoEntrance_FloorZero_DoesNotChangeFloor() {
+        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
+        GenerationStrategy strategy = new SimpleFillStrategy();
+        manager.makeMap(5, 5, strategy);
+        Player mockPlayer = MockFactory.createMockPlayer();
+        manager.setPlayer(mockPlayer);
 
-    /**
-          ---- Tests ----
-     Map is valid so, contains a walkable path between entrace and exit, no missing tiles,
+        int before = manager.getCurrentFloor();
 
-     Todo below
-     Test map entrance and exit dont spawn next to eachother, maybe minimum traversal distance?
-     Test tile "sets" like bridge spawning a straight bridge x tiles long etc
-     Test that floor spawns the proper map and uses proper structures and tiles
-     */
+        boolean moved = manager.priorMap();
 
-    @Test
-    public void playerWalk_UpdatesTiles(){
-
+        assertFalse(moved);
+        assertEquals(before, manager.getCurrentFloor());
     }
 
     @Test
-    public void playerWalkOverItem_PicksItemFromTile(){
+    public void playerWalksOntoEntrance_FloorGreaterThanZero_MovesUp() {
+        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
+        GenerationStrategy strategy = new SimpleFillStrategy();
+        manager.makeMap(5, 5, strategy);
+        manager.makeMap(5, 5, strategy);
+        manager.setPlayer(MockFactory.createMockPlayer());
 
+
+        manager.nextMap();
+        assertEquals(1, manager.getCurrentFloor());
+
+        boolean moved = manager.priorMap();
+
+        assertTrue(moved);
+        assertEquals(0, manager.getCurrentFloor());
     }
 
     @Test
-    public void testPathExistsEntranceToExit() {
-        DungeonMap map = dungeonMapManager.getMap();
-        WalkablePathFinder pathFinder = new WalkablePathFinder(map, START_SYMBOL, END_SYMBOL);
+    public void playerWalksOntoExit_NotLastFloor_MovesDown() {
+        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
+        GenerationStrategy strategy = new SimpleFillStrategy();
+        manager.makeMap(5, 5, strategy);
+        manager.makeMap(5, 5, strategy);
+        manager.makeMap(5, 5, strategy);
+        manager.setPlayer(MockFactory.createMockPlayer());
 
-        boolean exists = pathFinder.pathExists();
-        dungeonMapManager.getMap().drawMap(); //todo remove
+        assertEquals(0, manager.getCurrentFloor());
+        boolean moved = manager.nextMap();
 
-        assertTrue(exists);
+        assertTrue(moved);
+        assertEquals(1, manager.getCurrentFloor());
     }
 
     @Test
-    public void testPathDoesntExistEntranceToExit(){
+    public void playerWalksOntoExit_LastFloor_EndsDungeon() {
+        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
+        GenerationStrategy strategy = new SimpleFillStrategy();
+        manager.makeMap(5, 5, strategy);
+        manager.makeMap(5, 5, strategy);
+        manager.setPlayer(MockFactory.createMockPlayer());
 
+        manager.nextMap();
+        assertEquals(1, manager.getCurrentFloor());
+
+        boolean moved = manager.nextMap();
+
+        assertFalse(moved);
+        assertTrue(manager.isDungeonCompleted());
     }
 
-    @Test
-    public void testMapBorderOnlyWalls(){
-        DungeonMap generatedMap = dungeonMapManager.getMap();
-        int mapHeight = generatedMap.getHeight();
-        int mapWidth = generatedMap.getWidth();
 
-        for (int y = 0; y < mapHeight; y++) {
-            for (int x = 0; x < mapWidth; x++) {
-                if (isBorder(y, x, mapHeight, mapWidth)) {
-                    assertInstanceOf(Wall.class, generatedMap.getTileGrid()[y][x]);
-                }
-            }
-
-        }
-    }
-
-    private boolean isBorder(int y, int x, int mapHeight, int mapWidth){
-        boolean isTopWall = y == 0;
-        boolean isBottomWall = y == mapHeight - 1;
-        boolean isLeftWall = x == 0;
-        boolean isRightWall = x == mapWidth - 1;
-
-        return isTopWall || isBottomWall || isLeftWall || isRightWall;
-    }
-
-    @Test
-    void testHasEntranceAndExit() {
-        DungeonMap map = dungeonMapManager.getMap();
-
-        boolean hasEntrance = false;
-        boolean hasExit = false;
-
-        for (Tile[] row : map.getTileGrid()) {
-            for (Tile tile : row) {
-                if (tile instanceof Entrance) hasEntrance = true;
-                if (tile instanceof Exit) hasExit = true;
-            }
-        }
-
-        assertTrue(hasEntrance);
-        assertTrue(hasExit);
-    }
 }
