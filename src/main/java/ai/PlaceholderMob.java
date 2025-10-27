@@ -8,8 +8,13 @@ public class PlaceholderMob extends GameObject {
     private final int movementSpeed;
     private int currentHealth;
     private boolean hostile;
+    private boolean combat;
+    private boolean vulnerable;
     private Position currentPosition;
     private final Position spawnPoint;
+    private static final int SPAWN_RADIUS = 20;
+    private static final int AGGRO_RADIUS = 10;
+    private static final int COMBAT_RADIUS = 40;
 
 
     public PlaceholderMob(Position position, char objectSymbol, int maximumHealth, int movementSpeed, boolean hostile){
@@ -20,6 +25,8 @@ public class PlaceholderMob extends GameObject {
         this.hostile = hostile;
         currentPosition = new Position(position.x, position.y);
         spawnPoint = new Position(position.x, position.y);
+        combat = false;
+        vulnerable = true;
     }
 
     public int getX(){
@@ -42,6 +49,14 @@ public class PlaceholderMob extends GameObject {
         return hostile;
     }
 
+    public boolean isVulnerable(){
+        return vulnerable;
+    }
+
+    public boolean inCombat(){
+        return combat;
+    }
+
     public int getMovementSpeed(){
         return movementSpeed;
     }
@@ -50,8 +65,38 @@ public class PlaceholderMob extends GameObject {
         return maximumHealth;
     }
 
-    public void setHostile(boolean hostility){
-        hostile = hostility;
+    public int getCurrentHealth(){
+        return currentHealth;
+    }
+
+    public int getSpawnRadius(){
+        return SPAWN_RADIUS;
+    }
+
+    public int getAggroRadius(){
+        return AGGRO_RADIUS;
+    }
+
+    public int getCombatRadius(){
+        return COMBAT_RADIUS;
+    }
+
+    public void setHostile(boolean hostile){
+        this.hostile = hostile;
+    }
+
+    public void setVulnerable(boolean vulnerable){
+        this.vulnerable = vulnerable;
+    }
+
+    public void setCombat(boolean combat){
+        this.combat = combat;
+    }
+
+    public void receiveAttack(int damage){
+        setCombat(true);
+        if (vulnerable)
+            updateCurrentHealth(-damage);
     }
 
     public void updateCurrentHealth(int adjustment){

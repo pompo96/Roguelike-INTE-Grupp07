@@ -13,29 +13,29 @@ public class AiTest {
     Player defaultMockPlayer;
 
     @BeforeEach
-    void InitializeDefaultAi(){
+    void initializeDefaultAi(){
         defaultMob = new PlaceholderMob(new Position(50, 50), 'p', 50, 5, true);
         defaultMockPlayer = mock(Player.class);
         defaultAi = new Ai(defaultMob, defaultMockPlayer);
 
     }
     @Test
-    void testMobIsStoredAndFetchedCorrectly() {
+    void mobIsStoredAndFetchedCorrectly() {
         assertEquals(defaultMob, defaultAi.getMob());
     }
 
     @Test
-    void testPlayerIsStoredAndFetchedCorrectly(){
+    void playerIsStoredAndFetchedCorrectly(){
         assertEquals(defaultMockPlayer, defaultAi.getPlayer());
     }
 
     @Test
-    void testConstructorSetsStateToIdle(){
+    void constructorSetsStateToIdle(){
         assertEquals(MobState.IDLE, defaultAi.getState());
     }
 
     @Test
-    void testCanSwitchFromIdleToPatrollingAfterSufficientFrames(){
+    void canSwitchFromIdleToPatrollingAfterSufficientFrames(){
         for(int i=0; i < 3; i++){
             defaultAi.update();
         }
@@ -43,7 +43,7 @@ public class AiTest {
     }
 
     @Test
-    void testCanSwitchFromPatrollingToIdle(){
+    void canSwitchFromPatrollingToIdle(){
         for(int i=0; i < 3; i++){
             defaultAi.update();
         }
@@ -54,7 +54,7 @@ public class AiTest {
     }
 
     @Test
-    void testPatrollingSetsDestinationNotCurrentPosition(){
+    void patrollingSetsDestinationNotCurrentPosition(){
         Position currentPosition = defaultAi.getMob().getCurrentPosition();
         for(int i=0; i < 3; i++){
             defaultAi.update();
@@ -63,7 +63,7 @@ public class AiTest {
     }
 
     @Test
-    void testPatrollingMovesMob(){
+    void patrollingMovesMob(){
         for(int i=0; i < 3; i++){
             defaultAi.update();
         }
@@ -76,16 +76,70 @@ public class AiTest {
     }
 
     @Test
-    void testOnlyMovesMobTheirMovementSpeedPerFrame(){
+    void onlyMovesMobTheirMovementSpeedPerFrame(){
         for(int i=0; i < 3; i++){
             defaultAi.update();
         }
-        Position customDestination = new Position(60, 50 );
+        Position customDestination = new Position(100, 50 );
         Position expectedMovementInOneFrame = new Position(50 + defaultAi.getMob().getMovementSpeed(),50);
         defaultAi.setDestination(customDestination);
         defaultAi.update();
         assertEquals(expectedMovementInOneFrame, defaultAi.getMob().getCurrentPosition());
     }
 
+    @Test
+    void receivingAttackBeginsCombat(){
+        for(int i=0; i < 10; i++){
+            defaultAi.update();
+        }
+        when(defaultMockPlayer.getX()).thenReturn(52);
+        when(defaultMockPlayer.getY()).thenReturn(50);
+        defaultAi.getMob().receiveAttack(10);
+        defaultAi.update();
+        assertEquals(MobState.COMBAT, defaultAi.getState());
+    }
+
+    @Test
+    void canChasePlayer(){
+        when(defaultMockPlayer.getX()).thenReturn(57);
+        when(defaultMockPlayer.getY()).thenReturn(50);
+        defaultAi.getMob().receiveAttack(5);
+        defaultAi.update();
+        Position expectedPosition = new Position(50 + defaultAi.getMob().getMovementSpeed(),50);
+        assertEquals(expectedPosition, defaultAi.getMob().getCurrentPosition());
+    }
+
+    @Test
+    void stopsChasingWhenNextToPlayer(){
+        when(defaultMockPlayer.getX()).thenReturn(53);
+        when(defaultMockPlayer.getY()).thenReturn(53);
+        defaultAi.getMob().receiveAttack(10);
+        defaultAi.update();
+        Position expectedPosition = new Position(52,52);
+        assertEquals(expectedPosition, defaultAi.getMob().getCurrentPosition());
+    }
+
+    @Test
+    void attacksWhenNextToPlayer(){
+        when(defaultMockPlayer.getX()).thenReturn(51);
+        when(defaultMockPlayer.getY()).thenReturn(51);
+        Ai spyAi = spy(defaultAi);
+        spyAi.getMob().receiveAttack(8);
+        spyAi.update();
+        verify(spyAi).attack();
+    }
+
+
+    @Test
+    void entersResetStateWhenPlayerOutOfCombatRange(){
+        when(defaultMockPlayer.getX()).thenReturn(40);
+        when(defaultMockPlayer.getY()).thenReturn(55);
+        defaultAi.getMob().receiveAttack(13);
+        defaultAi.update();
+        defaultAi.update();
+        when(defaultMockPlayer.getY()).thenReturn(125);
+        defaultAi.update();
+        assertEquals(MobState.RESET, defaultAi.getState());
+    }
 
 }

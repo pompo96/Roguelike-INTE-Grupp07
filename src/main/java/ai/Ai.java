@@ -10,7 +10,7 @@ public class Ai {
     private MobState state;
     private int idleFrames;
     private Position destination;
-    private static final int SPAWN_RADIUS = 20;
+
 
     public Ai(PlaceholderMob mob, Player player){
         this.mob = mob;
@@ -37,6 +37,10 @@ public class Ai {
     }
 
     public void update(){
+        if(mob.getCurrentHealth() < 1)
+            state = MobState.DEAD;
+        else if(mob.inCombat())
+            beginCombat();
         switch (state) {
             case IDLE:
                 if(idleFrames>1){
@@ -46,13 +50,35 @@ public class Ai {
                 } break;
 
             case PATROLLING:
-                patroll();
+                moveToDestination();
+                break;
+
+            case COMBAT:
+                if (playerOutOfCombatRadius())
+                    beginReset();
+                else
+                    engagePlayer();
 
 
         }
     }
 
-    private void beginPatrolling(){
+    void beginIdle(){
+        state = MobState.IDLE;
+        idleFrames = 0;
+    }
+
+    void beginCombat(){
+        state = MobState.COMBAT;
+        player.engageMob(mob);
+    }
+    private void beginReset(){
+        state = MobState.RESET;
+        mob.setVulnerable(false);
+        mob.updateCurrentHealth(mob.getMaximumHealth() - mob.getCurrentHealth());
+    }
+
+    void beginPatrolling(){
         state = MobState.PATROLLING;
         setDestination(generatePatrollDestination());
     }
@@ -61,21 +87,21 @@ public class Ai {
         this.destination = destination;
     }
 
-    private Position generatePatrollDestination(){
+    Position generatePatrollDestination(){
         Position candidate;
         do {
             Random rand = new Random();
             double angle = rand.nextDouble() * 2 * Math.PI;
-            double distance = rand.nextDouble() * SPAWN_RADIUS;
+            double distance = rand.nextDouble() * mob.getSpawnRadius();
             int dx = (int) Math.round(Math.cos(angle) * distance);
             int dy = (int) Math.round(Math.sin(angle) * distance);
             candidate = new Position(mob.getX() + dx, mob.getY() + dy);
         }
         while(candidate.equals(mob.getCurrentPosition()) || candidate.x < 2 || candidate.y < 2);
-            return candidate;
+        return candidate;
     }
 
-    private void patroll(){
+    void moveToDestination(){
         int xStep = mob.getX();
         int yStep = mob.getY();
         boolean destinationReached = false;
@@ -94,8 +120,40 @@ public class Ai {
             beginIdle();
     }
 
-    private void beginIdle(){
-        state = MobState.IDLE;
-        idleFrames = 0;
+    boolean playerOutOfCombatRadius(){
+        double distanceToPlayer = Math.sqrt(
+                Math.pow(player.getX() - mob.getSpawnPoint().x, 2) +
+                        Math.pow(player.getY() - mob.getSpawnPoint().y, 2)
+        );
+        return distanceToPlayer > mob.getCombatRadius();
+
     }
+
+    void engagePlayer(){
+        if (nextToPlayer())
+            attack();
+        else
+            chasePlayer();
+    }
+
+    boolean nextToPlayer(){
+        return Math.abs(player.getX() - mob.getX()) < 2 && Math.abs(player.getY() - mob.getY()) < 2;
+    }
+
+    void attack(){
+        mob.attack(player);
+    }
+
+    void chasePlayer(){
+        int xStep = mob.getX();
+        int yStep = mob.getY();
+        for(int i = 0; i < mob.getMovementSpeed(); i++){
+            if(Math.abs(xStep - player.getX()) > 1)
+                xStep+= Integer.compare(player.getX(), xStep);
+            if(Math.abs(yStep - player.getY()) > 1)
+                yStep+= Integer.compare(player.getY(), yStep);
+        }
+        mob.move(new Position(xStep, yStep));
+    }
+
 }
