@@ -36,20 +36,56 @@ public class AiTest {
 
     @Test
     void testCanSwitchFromIdleToPatrollingAfterSufficientFrames(){
-        for(int i=0; i < 4; i++){
+        for(int i=0; i < 3; i++){
             defaultAi.update();
         }
         assertEquals(MobState.PATROLLING, defaultAi.getState());
     }
 
     @Test
-    void testPatrollingSetsDestinationNotCurrentPosition(){
-        Position currentPosition = defaultAi.getMob().getCurrentPosition();
-        for(int i=0; i < 5; i++){
+    void testCanSwitchFromPatrollingToIdle(){
+        for(int i=0; i < 3; i++){
             defaultAi.update();
         }
+        Position customDestination = new Position(54, 48);
+        defaultAi.setDestination(customDestination);
+        defaultAi.update();
+        assertEquals(MobState.IDLE, defaultAi.getState());
+    }
 
+    @Test
+    void testPatrollingSetsDestinationNotCurrentPosition(){
+        Position currentPosition = defaultAi.getMob().getCurrentPosition();
+        for(int i=0; i < 3; i++){
+            defaultAi.update();
+        }
         assertNotEquals(currentPosition, defaultAi.getDestination());
     }
+
+    @Test
+    void testPatrollingMovesMob(){
+        for(int i=0; i < 3; i++){
+            defaultAi.update();
+        }
+        Position customDestination = new Position(53, 53);
+        defaultAi.setDestination(customDestination);
+        defaultAi.update();
+        Position afterPatroll = defaultAi.getMob().getCurrentPosition();
+        assertEquals(customDestination, afterPatroll);
+
+    }
+
+    @Test
+    void testOnlyMovesMobTheirMovementSpeedPerFrame(){
+        for(int i=0; i < 3; i++){
+            defaultAi.update();
+        }
+        Position customDestination = new Position(60, 50 );
+        Position expectedMovementInOneFrame = new Position(50 + defaultAi.getMob().getMovementSpeed(),50);
+        defaultAi.setDestination(customDestination);
+        defaultAi.update();
+        assertEquals(expectedMovementInOneFrame, defaultAi.getMob().getCurrentPosition());
+    }
+
 
 }

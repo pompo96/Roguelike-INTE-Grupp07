@@ -50,6 +50,10 @@ public class PlaceholderMob extends GameObject {
         return maximumHealth;
     }
 
+    public void setHostile(boolean hostility){
+        hostile = hostility;
+    }
+
     public void updateCurrentHealth(int adjustment){
         int finalCurrentHealth = currentHealth + adjustment;
         if (finalCurrentHealth > maximumHealth) {

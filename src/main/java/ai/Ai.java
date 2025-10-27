@@ -5,8 +5,8 @@ import player.Player;
 import java.util.Random;
 
 public class Ai {
-    private PlaceholderMob mob;
-    private Player player;
+    private final PlaceholderMob mob;
+    private final Player player;
     private MobState state;
     private int idleFrames;
     private Position destination;
@@ -39,18 +39,14 @@ public class Ai {
     public void update(){
         switch (state) {
             case IDLE:
-                if(idleFrames>2){
+                if(idleFrames>1){
                     beginPatrolling();
                 } else {
                     idleFrames++;
                 } break;
 
             case PATROLLING:
-                if(mob.getX() == destination.x && mob.getY() == destination.y){
-                    state = MobState.IDLE;
-                } else {
-                    patroll();
-                }
+                patroll();
 
 
         }
@@ -58,8 +54,11 @@ public class Ai {
 
     private void beginPatrolling(){
         state = MobState.PATROLLING;
-        destination = generatePatrollDestination();
-        idleFrames = 0;
+        setDestination(generatePatrollDestination());
+    }
+
+    public void setDestination(Position destination) {
+        this.destination = destination;
     }
 
     private Position generatePatrollDestination(){
@@ -77,7 +76,26 @@ public class Ai {
     }
 
     private void patroll(){
-
+        int xStep = mob.getX();
+        int yStep = mob.getY();
+        boolean destinationReached = false;
+        for(int i = 0; i < mob.getMovementSpeed(); i++){
+            if(destination.x == xStep && destination.y == yStep){
+                destinationReached = true;
+                break;
+            }
+            else{
+                xStep+= Integer.compare(destination.x, xStep);
+                yStep+= Integer.compare(destination.y, yStep);
+            }
+        }
+        mob.move(new Position(xStep, yStep));
+        if (destinationReached)
+            beginIdle();
     }
 
+    private void beginIdle(){
+        state = MobState.IDLE;
+        idleFrames = 0;
+    }
 }
