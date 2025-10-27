@@ -37,7 +37,6 @@ public class PlayerTests {
     public void initializePlayer(){
 
 
-        //Skapa en quest interface för att använda mock?
         mockQuestList = mock(Quest.class);
         mockRace = mock(Race.class);
         mockItemWeapon = mock(Item.class);
