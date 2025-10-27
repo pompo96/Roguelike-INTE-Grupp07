@@ -5,16 +5,18 @@ import player.Player;
 
 public class PlaceholderMob extends GameObject {
     private final int maximumHealth;
+    private final int movementSpeed;
     private int currentHealth;
-    private final boolean hostile;
+    private boolean hostile;
     private Position currentPosition;
     private final Position spawnPoint;
 
 
-    public PlaceholderMob(Position position, char objectSymbol, int maximumHealth, boolean hostile){
+    public PlaceholderMob(Position position, char objectSymbol, int maximumHealth, int movementSpeed, boolean hostile){
         super(position.y, position.x, objectSymbol);
         this.maximumHealth = maximumHealth;
         this.currentHealth = maximumHealth;
+        this.movementSpeed = movementSpeed;
         this.hostile = hostile;
         currentPosition = new Position(position.x, position.y);
         spawnPoint = new Position(position.x, position.y);
@@ -28,6 +30,10 @@ public class PlaceholderMob extends GameObject {
         return currentPosition.y;
     }
 
+    public Position getCurrentPosition(){
+        return new Position(currentPosition.x, currentPosition.y);
+    }
+
     public Position getSpawnPoint(){
         return new Position(spawnPoint.x, spawnPoint.y);
     }
@@ -36,19 +42,29 @@ public class PlaceholderMob extends GameObject {
         return hostile;
     }
 
-    public void move(Position destination){
-        currentPosition = destination;
+    public int getMovementSpeed(){
+        return movementSpeed;
     }
 
-    public void attack(){
-        player.updateCurrentLife(-1);
+    public int getMaximumHealth() {
+        return maximumHealth;
     }
 
     public void updateCurrentHealth(int adjustment){
         int finalCurrentHealth = currentHealth + adjustment;
-        if (finalCurrentHealth > this.maximumHealth) {
-            finalCurrentHealth = this.maximumHealth;
+        if (finalCurrentHealth > maximumHealth) {
+            finalCurrentHealth = maximumHealth;
         }
         this.currentHealth = finalCurrentHealth;
     }
+
+    public void move(Position destination){
+        currentPosition = destination;
+    }
+
+    public void attack(Player player){
+        player.updateCurrentLife(-1);
+    }
+
+
 }
