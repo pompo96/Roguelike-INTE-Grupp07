@@ -20,13 +20,15 @@ public class IceSpell implements Magic {
     @Override
     public int castSpell(Player caster, Player target) {
         if (getNumberOfUses() == 0) {
-            return 0;
+            throw new IllegalStateException("Spell cannot be cast anymore!");
         }
         DamageCalculator calculator = new DamageCalculator();
         accept(calculator, caster, target);
-
         numberOfUses--;
-        return calculator.getCalculatedDamage();
+
+        int damageTaken = calculator.getCalculatedDamage();
+        target.updateCurrentLife(-damageTaken);
+        return damageTaken;
     }
 
     @Override

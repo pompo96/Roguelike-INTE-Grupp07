@@ -19,14 +19,16 @@ public class FireSpell implements Magic {
 
     @Override
     public int castSpell(Player caster, Player target) {
-        DamageCalculator calculatedDamage = new DamageCalculator();
-        accept(calculatedDamage, caster, target);
-
         if (getNumberOfUses() == 0) {
-            return 0;
+            throw new IllegalStateException("Spell cannot be cast anymore!");
         }
+        DamageCalculator calculator = new DamageCalculator();
+        accept(calculator, caster, target);
         numberOfUses--;
-        return calculatedDamage.getCalculatedDamage();
+
+        int damageTaken = calculator.getCalculatedDamage();
+        target.updateCurrentLife(-damageTaken);
+        return damageTaken;
     }
     @Override
     public void accept(SpellVisitor visitor, Player caster, Player target){

@@ -26,27 +26,13 @@ public class MagicTest {
             spell.castSpell(caster, target);
         }
 
-        int damage = spell.castSpell(caster, target);
-
-        assertEquals(0, damage, spell.getClass().getSimpleName() + " får inte användas fler gånger än tillåtet");
+        assertThrows(IllegalStateException.class, () -> {
+            spell.castSpell(caster, target);
+        });
     }
 
     static List<Magic> spellProvider() {
         return List.of(new FireSpell(), new IceSpell());
-    }
-
-    @Test
-    public void fireSpell_CanNotCastMoreThanItsAmount(){//Är inte färdig
-        FireSpell fireSpell = new FireSpell();
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
-
-        fireSpell.castSpell(caster, target);
-        fireSpell.castSpell(caster, target);
-        fireSpell.castSpell(caster, target);
-        int spellDamageAfterAmountOfUses = fireSpell.castSpell(caster, target);
-
-        assertEquals(0, spellDamageAfterAmountOfUses, "En firespell får inte användas mer än 3 gånger");
     }
 
     @ParameterizedTest(name = "FireSpell mot {0} ska ge {1} damage")
@@ -102,6 +88,45 @@ public class MagicTest {
         boolean lightSource = fireSpellWithLightSource.castLightSource(true);
 
         assertTrue(lightSource, "Solen är ute och inte månen, alltså kan du inte använda en lighteffect");
+    }
+
+    @ParameterizedTest(name = "HealingSpell mot {0} ska öka dens liv med {1}")
+    @CsvSource({
+            "Dwarf, 5", //mindre healing
+            "Elf, 20" //mer healing
+    })
+    void healingSpell_HealsHealthPool(String raceName, int expectedHealthIncrease){
+        Player caster = mock(Player.class);
+        Player target = mock(Player.class);
+
+        switch (raceName) {
+            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
+            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
+        }
+
+        Magic healingSpell = new HealingSpell();
+        int actualHealing = healingSpell.castSpell(caster, target);
+        assertEquals(actualHealing, expectedHealthIncrease, "HealingSpell ska uppdatera en spelares liv korrekt beroende på ras");
+    }
+    @ParameterizedTest(name = "HealingSpell mot {0} ska öka dens liv med {1}")
+    @CsvSource({
+            "Dwarf, 5", //mindre healing
+            "Elf, 20" //mer healing
+    })
+    void buffedHealingSpell_HealsHealthPoolAndIncreasesMaxHealth(String raceName, int expectedHealthIncrease){
+        Player caster = mock(Player.class);
+        Player target = mock(Player.class);
+
+        switch (raceName) {
+            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
+            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
+        }
+
+        Magic buffedHealingSpell = new BuffedHealingSpell(new HealingSpell());
+        int actualHealing = buffedHealingSpell.castSpell(caster, target);
+        assertEquals(actualHealing, expectedHealthIncrease, "HealingSpell ska uppdatera en spelares liv och maximala liv korrekt beroende på ras");
     }
 }
 

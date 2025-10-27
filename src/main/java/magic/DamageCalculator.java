@@ -27,6 +27,16 @@ public class DamageCalculator implements SpellVisitor {
             calculatedDamage = damage + 10;
         }
     }
+    public void visit(HealingSpell healingSpell, Player caster, Player target){
+        int healingPower = healingSpell.getBaseDamage();
+        if(target.getRace() instanceof Dwarf){
+            healingPower -= 5;
+        }
+        if(target.getRace() instanceof Elf){
+            healingPower += 10;
+        }
+        calculatedDamage = healingPower;
+    }
 
     public int getCalculatedDamage() {
         return calculatedDamage;
