@@ -170,6 +170,9 @@ public class Player extends GameObject {
         engagedMobs.remove(mob);
     }
 
+    public Set<PlaceholderMob> getEngagedMobs(){
+        return Collections.unmodifiableSet(engagedMobs);
+    }
 
 public void openQuestLog() {
     this.questLogOpen = true;

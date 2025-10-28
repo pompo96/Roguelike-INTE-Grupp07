@@ -8,6 +8,7 @@ public class PlaceholderMob extends GameObject {
     private final int movementSpeed;
     private int currentHealth;
     private boolean hostile;
+    private boolean combatAlert;
     private boolean combat;
     private boolean vulnerable;
     private Position currentPosition;
@@ -25,6 +26,7 @@ public class PlaceholderMob extends GameObject {
         this.hostile = hostile;
         currentPosition = new Position(position.x, position.y);
         spawnPoint = new Position(position.x, position.y);
+        combatAlert = false;
         combat = false;
         vulnerable = true;
     }
@@ -51,6 +53,10 @@ public class PlaceholderMob extends GameObject {
 
     public boolean isVulnerable(){
         return vulnerable;
+    }
+
+    public boolean getCombatAlert(){
+        return combatAlert;
     }
 
     public boolean inCombat(){
@@ -89,13 +95,20 @@ public class PlaceholderMob extends GameObject {
         this.vulnerable = vulnerable;
     }
 
+    public void setCombatAlert(boolean combatAlert){
+        this.combatAlert = combatAlert;
+    }
+
     public void setCombat(boolean combat){
         this.combat = combat;
     }
 
     public void receiveAttack(int damage){
         if (vulnerable) {
-            setCombat(true);
+            if(!combat) {
+                setCombatAlert(true);
+                setCombat(true);
+            }
             updateCurrentHealth(-damage);
         }
     }

@@ -3,6 +3,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import player.Player;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -11,14 +14,21 @@ public class AiTest {
     PlaceholderMob defaultMob;
     Ai defaultAi;
     Player defaultMockPlayer;
+    PlaceholderMob neutralMob;
+    Ai neutralAi;
 
     @BeforeEach
     void initializeDefaultAi(){
         defaultMob = new PlaceholderMob(new Position(50, 50), 'p', 50, 5, true);
         defaultMockPlayer = mock(Player.class);
         defaultAi = new Ai(defaultMob, defaultMockPlayer);
-
     }
+
+    void initializeNeutralAi(){
+        neutralMob = new PlaceholderMob(new Position(150, 150), 'p', 50, 5, false);
+        neutralAi = new Ai(neutralMob, defaultMockPlayer);
+    }
+
     @Test
     void mobIsStoredAndFetchedCorrectly() {
         assertEquals(defaultMob, defaultAi.getMob());
@@ -70,8 +80,8 @@ public class AiTest {
         Position customDestination = new Position(53, 53);
         defaultAi.setDestination(customDestination);
         defaultAi.update();
-        Position afterPatroll = defaultAi.getMob().getCurrentPosition();
-        assertEquals(customDestination, afterPatroll);
+        Position afterPatrol = defaultAi.getMob().getCurrentPosition();
+        assertEquals(customDestination, afterPatrol);
 
     }
 
@@ -91,6 +101,7 @@ public class AiTest {
         when(defaultMockPlayer.getX()).thenReturn(57);
         when(defaultMockPlayer.getY()).thenReturn(50);
         defaultAi.getMob().receiveAttack(5);
+        defaultAi.update();
         defaultAi.update();
     }
 
@@ -127,6 +138,7 @@ public class AiTest {
         when(defaultMockPlayer.getY()).thenReturn(51);
         Ai spyAi = spy(defaultAi);
         spyAi.getMob().receiveAttack(8);
+        spyAi.update();
         spyAi.update();
         verify(spyAi).attack();
     }
@@ -174,7 +186,6 @@ public class AiTest {
     void resetMakesMobReturnToSpawnPoint(){
         setUpResetScenario();
         defaultAi.update();
-        defaultAi.update();
         Position expectedPosition = defaultAi.getMob().getSpawnPoint();
         Position actualPosition = defaultAi.getMob().getCurrentPosition();
         assertEquals(expectedPosition, actualPosition);
@@ -188,6 +199,82 @@ public class AiTest {
         assertEquals(MobState.IDLE, defaultAi.getState());
     }
 
+    @Test
+    void hostileMobEntersCombatWithPlayerInsideItsAggroRange(){
+        when(defaultMockPlayer.getX()).thenReturn(53);
+        when(defaultMockPlayer.getY()).thenReturn(44);
+        defaultAi.update();
+        assertEquals(MobState.COMBAT, defaultAi.getState());
+    }
+
+    @Test
+    void neutralMobDoesNotEnterCombatWithPlayerInsideItsAggroRange(){
+        initializeNeutralAi();
+        when(defaultMockPlayer.getX()).thenReturn(145);
+        when(defaultMockPlayer.getY()).thenReturn(149);
+        neutralAi.update();
+        assertEquals(MobState.IDLE, neutralAi.getState());
+    }
+    @Test
+    void hostileMobDoesntEnterCombatWithPlayerOutsideItsAggroRange(){
+        when(defaultMockPlayer.getX()).thenReturn(defaultAi.getMob().getX());
+        when(defaultMockPlayer.getY()).thenReturn(defaultAi.getMob().getY() + defaultAi.getMob().getAggroRadius() + 1);
+        defaultAi.update();
+        assertEquals(MobState.IDLE, defaultAi.getState());
+    }
+
+
+    void setUpHostileReactionToSocialAggroScenario(boolean hostile){
+        PlaceholderMob secondaryMob = new PlaceholderMob(new Position (45, 43), 'p', 100, 3, hostile);
+        Ai secondaryAi = new Ai(secondaryMob, defaultMockPlayer);
+        when(defaultMockPlayer.getX()).thenReturn(65);
+        when(defaultMockPlayer.getY()).thenReturn(32);
+        Set<PlaceholderMob> mockSet = new HashSet<PlaceholderMob>();
+        mockSet.add(secondaryMob);
+        when(defaultMockPlayer.getEngagedMobs()).thenReturn(mockSet);
+        secondaryMob.receiveAttack(20);
+        secondaryAi.update();
+        defaultAi.update();
+    }
+
+
+
+    @Test
+    void hostileMobAffectedBySocialAggroFromHostileMob(){
+        setUpHostileReactionToSocialAggroScenario(true);
+        assertEquals(MobState.COMBAT, defaultAi.getState());
+    }
+
+    @Test
+    void hostileMobNotAffectedBySocialAggroFromNeutralMob(){
+        setUpHostileReactionToSocialAggroScenario(false);
+        assertEquals(MobState.IDLE, defaultAi.getState());
+    }
+
+    void setUpNeutralReactionToSocialAggroScenario(boolean hostile){
+        initializeNeutralAi();
+        PlaceholderMob secondaryMob = new PlaceholderMob(new Position (148, 156), 'p', 100, 3, hostile);
+        Ai secondaryAi = new Ai(secondaryMob, defaultMockPlayer);
+        when(defaultMockPlayer.getX()).thenReturn(135);
+        when(defaultMockPlayer.getY()).thenReturn(163);
+        Set<PlaceholderMob> mockSet = new HashSet<PlaceholderMob>();
+        mockSet.add(secondaryMob);
+        when(defaultMockPlayer.getEngagedMobs()).thenReturn(mockSet);
+        secondaryAi.update();
+        neutralAi.update();
+    }
+
+    @Test
+    void neutralMobDoesNotReactToSocialAggroFromHostileMob(){
+        setUpNeutralReactionToSocialAggroScenario(true);
+        assertEquals(MobState.IDLE, neutralAi.getState());
+    }
+
+    @Test
+    void neutralMobDoesNotReactToSocialAggroFromNeutralMob(){
+        setUpNeutralReactionToSocialAggroScenario(false);
+        assertEquals(MobState.IDLE, neutralAi.getState());
+    }
 
 
 }

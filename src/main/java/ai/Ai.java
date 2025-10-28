@@ -3,6 +3,7 @@ package ai;
 import player.Player;
 
 import java.util.Random;
+import java.util.Set;
 
 public class Ai {
     private final PlaceholderMob mob;
@@ -39,29 +40,37 @@ public class Ai {
     public void update(){
         if(mob.getCurrentHealth() < 1)
             state = MobState.DEAD;
-        else if(mob.inCombat())
+        else if(mob.getCombatAlert()){
+            mob.setCombatAlert(false);
             beginCombat();
-        switch (state) {
-            case IDLE:
-                if(idleFrames>1){
-                    beginPatrolling();
-                } else {
-                    idleFrames++;
-                } break;
+        }
+        else {
+            switch (state) {
+                case IDLE:
+                    if (areaIsClear()) {
+                        if (idleFrames > 1)
+                            beginPatrolling();
+                        else
+                            idleFrames++;
 
-            case PATROLLING:
-                moveToDestination();
-                break;
+                    }
+                    break;
 
-            case COMBAT:
-                if (playerOutOfCombatRadius())
-                    beginReset();
-                else
-                    engagePlayer();
-                break;
-            case RESET:
-                moveToDestination();
-                break;
+                case PATROLLING:
+                    if (areaIsClear())
+                        moveToDestination();
+                    break;
+
+                case COMBAT:
+                    if (playerOutOfCombatRadius())
+                        beginReset();
+                    else
+                        engagePlayer();
+                    break;
+                case RESET:
+                    moveToDestination();
+                    break;
+            }
         }
     }
 
@@ -126,23 +135,44 @@ public class Ai {
             beginIdle();
     }
 
-    /*void returnToSpawnPoint(){
-        if(mob.getCurrentPosition().equals(mob.getSpawnPoint())){
-            mob.setVulnerable(true);
-            beginIdle();
+    boolean areaIsClear(){
+        if(!mob.isHostile())
+            return true;
+        else {
+            Position playerPos = new Position(player.getX(), player.getY());
+            if(isInAggroZone(playerPos)) {
+                beginCombat();
+                return false;
+            }
+            else {
+                Set<PlaceholderMob> allMobsInCombat = player.getEngagedMobs();
+                for(PlaceholderMob currentMob : allMobsInCombat){
+                    if(currentMob.isHostile() && isInAggroZone(currentMob.getCurrentPosition())){
+                        beginCombat();
+                        return false;
+                    }
+                }
+            }
         }
-        else
-            moveToDestination();
-    }*/
+        return true;
+    }
 
+    boolean isInAggroZone(Position pos){
+        double distanceToMob = calculateDistance(pos, mob.getCurrentPosition());
+        return distanceToMob <= mob.getAggroRadius();
+    }
+
+    /*boolean playerOutOfCombatRadius(){
+        double distanceToPlayer = Math.sqrt( Math.pow(player.getX() - mob.getSpawnPoint().x, 2) +
+                Math.pow(player.getY() - mob.getSpawnPoint().y, 2) );
+        return distanceToPlayer > mob.getCombatRadius();}*/
 
     boolean playerOutOfCombatRadius(){
-        double distanceToPlayer = Math.sqrt(
-                Math.pow(player.getX() - mob.getSpawnPoint().x, 2) +
-                        Math.pow(player.getY() - mob.getSpawnPoint().y, 2)
-        );
+        double distanceToPlayer = calculateDistance(mob.getSpawnPoint(), new Position(player.getX(), player.getY()));
         return distanceToPlayer > mob.getCombatRadius();
-
+    }
+    double calculateDistance(Position p1, Position p2){
+        return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)) ;
     }
 
     void engagePlayer(){
