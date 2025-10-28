@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import race.Race;
 import story.Quest;
 import utrustning.Item;
+import utrustning.Utrustning;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -288,6 +289,17 @@ public class PlayerTests {
         defaultPlayer.equipItem(mockItemWeapon);
         Map<String, Item> items = defaultPlayer.getItems();
         assertEquals(items.get("weapon"), mockItemWeapon);
+    }
+
+    @Test
+    public void playerCanAddItemToInventory() {
+        Player player = new Player(mockRace);
+        Item sword = new Utrustning("weapon", 1, "Sword", 15);
+
+        player.addToInventory(sword);
+
+        assertEquals(1, player.getInventorySize());
+        assertEquals(sword, player.getItemFromInventory(1));
     }
 
     //equipitems test + player metod se till att life/movement speed updateras korrekt

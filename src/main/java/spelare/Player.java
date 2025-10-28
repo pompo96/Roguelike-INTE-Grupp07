@@ -19,6 +19,8 @@ public class Player {
     static final int DEFAULT_ATTACK_POWER = 0;
     Map<String, Item> items;
     Map<String, Boolean> questProgress;
+    private Map<Integer, Item> inventory = new HashMap<>();
+
 
     public Player(Race race) {
         this(race, emptyItemList());
@@ -141,6 +143,18 @@ public class Player {
     public void equipBoots(Item item){
         items.put(item.getName(), item);
         updateMovementSpeed(item.getMovementModifier());
+    }
+
+    public void addToInventory(Item item) {
+        inventory.put(item.getID(), item);
+    }
+
+    public int getInventorySize() {
+        return inventory.size();
+    }
+
+    public Item getItemFromInventory(int id) {
+        return inventory.get(id);
     }
 
     public int getMovementSpeed() {
