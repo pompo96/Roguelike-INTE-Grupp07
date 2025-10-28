@@ -229,7 +229,7 @@ public class AiTest {
         Ai secondaryAi = new Ai(secondaryMob, defaultMockPlayer);
         when(defaultMockPlayer.getX()).thenReturn(65);
         when(defaultMockPlayer.getY()).thenReturn(32);
-        Set<PlaceholderMob> mockSet = new HashSet<PlaceholderMob>();
+        Set<PlaceholderMob> mockSet = new HashSet<>();
         mockSet.add(secondaryMob);
         when(defaultMockPlayer.getEngagedMobs()).thenReturn(mockSet);
         secondaryMob.receiveAttack(20);
@@ -257,7 +257,7 @@ public class AiTest {
         Ai secondaryAi = new Ai(secondaryMob, defaultMockPlayer);
         when(defaultMockPlayer.getX()).thenReturn(135);
         when(defaultMockPlayer.getY()).thenReturn(163);
-        Set<PlaceholderMob> mockSet = new HashSet<PlaceholderMob>();
+        Set<PlaceholderMob> mockSet = new HashSet<>();
         mockSet.add(secondaryMob);
         when(defaultMockPlayer.getEngagedMobs()).thenReturn(mockSet);
         secondaryAi.update();
