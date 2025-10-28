@@ -58,14 +58,17 @@ public class Ai {
                     beginReset();
                 else
                     engagePlayer();
-
-
+                break;
+            case RESET:
+                moveToDestination();
+                break;
         }
     }
 
     void beginIdle(){
         state = MobState.IDLE;
         idleFrames = 0;
+        mob.setVulnerable(true);
     }
 
     void beginCombat(){
@@ -74,20 +77,23 @@ public class Ai {
     }
     private void beginReset(){
         state = MobState.RESET;
+        mob.setCombat(false);
         mob.setVulnerable(false);
         mob.updateCurrentHealth(mob.getMaximumHealth() - mob.getCurrentHealth());
+        player.disengageMob(mob);
+        destination = getMob().getSpawnPoint();
     }
 
     void beginPatrolling(){
         state = MobState.PATROLLING;
-        setDestination(generatePatrollDestination());
+        setDestination(generatePatrollingDestination());
     }
 
     public void setDestination(Position destination) {
         this.destination = destination;
     }
 
-    Position generatePatrollDestination(){
+    Position generatePatrollingDestination(){
         Position candidate;
         do {
             Random rand = new Random();
@@ -119,6 +125,16 @@ public class Ai {
         if (destinationReached)
             beginIdle();
     }
+
+    /*void returnToSpawnPoint(){
+        if(mob.getCurrentPosition().equals(mob.getSpawnPoint())){
+            mob.setVulnerable(true);
+            beginIdle();
+        }
+        else
+            moveToDestination();
+    }*/
+
 
     boolean playerOutOfCombatRadius(){
         double distanceToPlayer = Math.sqrt(

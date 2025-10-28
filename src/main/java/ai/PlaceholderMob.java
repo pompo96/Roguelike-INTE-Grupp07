@@ -94,9 +94,10 @@ public class PlaceholderMob extends GameObject {
     }
 
     public void receiveAttack(int damage){
-        setCombat(true);
-        if (vulnerable)
+        if (vulnerable) {
+            setCombat(true);
             updateCurrentHealth(-damage);
+        }
     }
 
     public void updateCurrentHealth(int adjustment){

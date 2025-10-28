@@ -87,35 +87,37 @@ public class AiTest {
         assertEquals(expectedMovementInOneFrame, defaultAi.getMob().getCurrentPosition());
     }
 
-    @Test
-    void receivingAttackBeginsCombat(){
-        for(int i=0; i < 10; i++){
-            defaultAi.update();
-        }
-        when(defaultMockPlayer.getX()).thenReturn(52);
-        when(defaultMockPlayer.getY()).thenReturn(50);
-        defaultAi.getMob().receiveAttack(10);
-        defaultAi.update();
-        assertEquals(MobState.COMBAT, defaultAi.getState());
-    }
-
-    @Test
-    void canChasePlayer(){
+    void setUpAttackReceptionScenario(){
         when(defaultMockPlayer.getX()).thenReturn(57);
         when(defaultMockPlayer.getY()).thenReturn(50);
         defaultAi.getMob().receiveAttack(5);
         defaultAi.update();
+    }
+
+    @Test
+    void receivingAttackBeginsCombat(){
+        setUpAttackReceptionScenario();
+        assertEquals(MobState.COMBAT, defaultAi.getState());
+    }
+
+    @Test
+    void beginningCombatPutsMobInPlayersAggroList(){
+        setUpAttackReceptionScenario();
+        verify(defaultMockPlayer).engageMob(defaultAi.getMob());
+    }
+
+    @Test
+    void canChasePlayer(){
+        setUpAttackReceptionScenario();
         Position expectedPosition = new Position(50 + defaultAi.getMob().getMovementSpeed(),50);
         assertEquals(expectedPosition, defaultAi.getMob().getCurrentPosition());
     }
 
     @Test
     void stopsChasingWhenNextToPlayer(){
-        when(defaultMockPlayer.getX()).thenReturn(53);
-        when(defaultMockPlayer.getY()).thenReturn(53);
-        defaultAi.getMob().receiveAttack(10);
+        setUpAttackReceptionScenario();
         defaultAi.update();
-        Position expectedPosition = new Position(52,52);
+        Position expectedPosition = new Position(56,50);
         assertEquals(expectedPosition, defaultAi.getMob().getCurrentPosition());
     }
 
@@ -129,9 +131,7 @@ public class AiTest {
         verify(spyAi).attack();
     }
 
-
-    @Test
-    void entersResetStateWhenPlayerOutOfCombatRange(){
+    void setUpResetScenario(){
         when(defaultMockPlayer.getX()).thenReturn(40);
         when(defaultMockPlayer.getY()).thenReturn(55);
         defaultAi.getMob().receiveAttack(13);
@@ -139,7 +139,55 @@ public class AiTest {
         defaultAi.update();
         when(defaultMockPlayer.getY()).thenReturn(125);
         defaultAi.update();
+    }
+
+    @Test
+    void entersResetStateWhenPlayerOutOfCombatRange(){
+        setUpResetScenario();
         assertEquals(MobState.RESET, defaultAi.getState());
     }
+
+    @Test
+    void resetMakesMobInvulnerable(){
+        setUpResetScenario();
+        int healthBeforeAttemptedAttack = defaultAi.getMob().getCurrentHealth();
+        defaultAi.getMob().receiveAttack(20);
+        int healthAfterAttemptedAttack = defaultAi.getMob().getCurrentHealth();
+        assertEquals(healthBeforeAttemptedAttack, healthAfterAttemptedAttack);
+    }
+
+    @Test
+    void resetMakesMobHealthFull(){
+        setUpResetScenario();
+        int expected = defaultAi.getMob().getMaximumHealth();
+        int actual = defaultAi.getMob().getCurrentHealth();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void resetRemovesMobFromPlayerAggroList(){
+        setUpResetScenario();
+        verify(defaultMockPlayer).disengageMob(defaultAi.getMob());
+    }
+
+    @Test
+    void resetMakesMobReturnToSpawnPoint(){
+        setUpResetScenario();
+        defaultAi.update();
+        defaultAi.update();
+        Position expectedPosition = defaultAi.getMob().getSpawnPoint();
+        Position actualPosition = defaultAi.getMob().getCurrentPosition();
+        assertEquals(expectedPosition, actualPosition);
+    }
+
+    @Test
+    void resetBeginsIdleUponReturnToSpawnPoint(){
+        setUpResetScenario();
+        defaultAi.update();
+        defaultAi.update();
+        assertEquals(MobState.IDLE, defaultAi.getState());
+    }
+
+
 
 }
