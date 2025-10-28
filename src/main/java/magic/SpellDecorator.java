@@ -18,7 +18,14 @@ public abstract class SpellDecorator implements Magic {
     public int getNumberOfUses() {
         return decoratedSpell.getNumberOfUses();
     }
-
+    @Override
+    public boolean checkIfAbleToCast(){
+        return decoratedSpell.checkIfAbleToCast();
+    }
+    @Override
+    public int checkEnvironmentBoost(){
+        return decoratedSpell.checkEnvironmentBoost();
+    }
     @Override
     public int castSpell(Player caster, Player target) {
         return decoratedSpell.castSpell(caster, target);
@@ -27,15 +34,5 @@ public abstract class SpellDecorator implements Magic {
     @Override
     public void accept(SpellVisitor visitor, Player caster, Player target) {
         decoratedSpell.accept(visitor, caster, target);
-    }
-
-    @Override
-    public boolean checkIfAbleToCast() {
-        return decoratedSpell.checkIfAbleToCast();
-    }
-
-    @Override
-    public int checkEnvironmentBoost() {
-        return decoratedSpell.checkEnvironmentBoost();
     }
 }

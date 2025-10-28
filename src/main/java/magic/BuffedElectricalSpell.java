@@ -1,10 +1,9 @@
 package magic;
-
 import player.Player;
 
-public class BuffedHealingSpell extends SpellDecorator{
+public class BuffedElectricalSpell extends SpellDecorator{
     private int numberOfUses = 5;
-    public BuffedHealingSpell(Magic decoratedSpell){
+    public BuffedElectricalSpell(Magic decoratedSpell){
         super(decoratedSpell);
     }
     @Override
@@ -18,6 +17,9 @@ public class BuffedHealingSpell extends SpellDecorator{
 
         int damageTaken = calculator.getCalculatedDamage();
         target.updateCurrentLife(-damageTaken);
+
+        int decreaseSpeedAmount = 2;
+        target.updateMovementSpeed(decreaseSpeedAmount);
         return damageTaken;
     }
 }

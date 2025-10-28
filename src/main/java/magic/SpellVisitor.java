@@ -6,5 +6,7 @@ public interface SpellVisitor {
     void visit(IceSpell iceSpell, Player caster, Player target);
     void visit(FireSpell fireSpell, Player caster, Player target);
     void visit(HealingSpell healingSpell, Player caster, Player target);
+    void visit(ElectricSpell electricSpell, Player caster, Player target);
+    void visit(PowerBoostSpell powerBoostSpell, Player caster, Player target);
     int getCalculatedDamage();
 }

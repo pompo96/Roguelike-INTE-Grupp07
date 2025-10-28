@@ -1,7 +1,6 @@
 package magic;
 
 public class LightEffect extends SpellDecorator {
-    private boolean moon;
     public LightEffect(Magic decoratedSpell) {
         super(decoratedSpell);
     }
@@ -10,9 +9,6 @@ public class LightEffect extends SpellDecorator {
         boolean castedLight = false;
         if(moon){
             castedLight = true;
-        }
-        if(!moon){
-            castedLight = false;
         }
         return castedLight;
     }
