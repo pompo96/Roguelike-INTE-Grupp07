@@ -34,7 +34,10 @@ public abstract class AbstractRace implements Race{
         return name;
     }
 
-    //magissystem, lägg till i subklasser om olika typer har olika krafter
-    //lägg in här om det finns krafter alla raser har
+    @Override
+    public abstract int getSpellModifier(Magic spell);
+
+    @Override
+    public abstract boolean canCastSpell(Magic spell);
 
 }
