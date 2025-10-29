@@ -71,8 +71,8 @@ public class PlayerTests {
         when(mockQuest2.getDescription()).thenReturn("Search for the artifact in the forest");
 
         //when(questList.getQuests()).thenReturn([("DungeonBeat", true), ("LostAndFound", false),("Tutorial", true)]);
-
-        defaultPlayer = new Player(mockRace);
+// todo fix
+//        defaultPlayer = new Player(mockRace);
     }
 
     @Test
@@ -244,7 +244,7 @@ public class PlayerTests {
         items.put("chestpiece", mockItemChestpiece);
         items.put("boots", mockItemBoots);
         int sizeOfMap = items.size();
-        Player player = new Player(mockRace, items);
+        Player player = new Player(mockRace, items, 0,0, 'P', "playa");
         assertEquals(player.getItems().size(), sizeOfMap, "getItems metoden returnerar för många nyckelvärden");
         assertEquals(player.getItems().get("helmet"), items.get("helmet"), "Det är inte en helmet");
         assertEquals(player.getItems().get("chestpiece"), items.get("chestpiece"), "Det är inte en chestpiece");

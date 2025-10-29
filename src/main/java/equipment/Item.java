@@ -7,6 +7,7 @@ public interface Item {
     int getWeaponDamage();
 
     String getName();
+    char getSymbol();
 
 
 }
