@@ -1,5 +1,7 @@
 package race;
 
+import magic.*;
+
 public abstract class AbstractRace implements Race{
 
     private final int lifeModifier;
