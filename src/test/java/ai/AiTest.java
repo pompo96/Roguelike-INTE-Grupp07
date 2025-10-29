@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import player.Player;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +20,7 @@ public class AiTest {
 
     @BeforeEach
     void initializeDefaultAi(){
+        Ai.removeAllMobs();
         defaultMob = new PlaceholderMob(new Position(50, 50), 'p', 50, 5, true);
         defaultMockPlayer = mock(Player.class);
         defaultAi = new Ai(defaultMob, defaultMockPlayer);
@@ -27,6 +29,30 @@ public class AiTest {
     void initializeNeutralAi(){
         neutralMob = new PlaceholderMob(new Position(150, 150), 'p', 50, 5, false);
         neutralAi = new Ai(neutralMob, defaultMockPlayer);
+    }
+
+    void updateUntilIdle(){
+        while(defaultAi.getState() != MobState.IDLE)
+            defaultAi.update();
+
+    }
+    void updateUntilPatrolling(){
+        for(int i = 0; i < 3; i++){
+            defaultAi.update();
+        }
+    }
+
+    void setMockPosition_inCombatRadius_outOfAggroRadius(){
+        when(defaultMockPlayer.getX()).thenReturn(75);
+        when(defaultMockPlayer.getY()).thenReturn(45);
+    }
+    void setMockPosition_inAggroRadius(){
+        when(defaultMockPlayer.getX()).thenReturn(46);
+        when(defaultMockPlayer.getY()).thenReturn(53);
+    }
+    void setMockPosition_outOfCombatRadius(){
+        when(defaultMockPlayer.getX()).thenReturn(120);
+        when(defaultMockPlayer.getY()).thenReturn(13);
     }
 
     @Test
@@ -45,6 +71,26 @@ public class AiTest {
     }
 
     @Test
+    void neutralAndDefaultAiStoredInStaticList(){
+        initializeNeutralAi();
+        List<Ai> aiList = Ai.getAllMobs();
+        assertTrue(aiList.contains(defaultAi) && aiList.contains(neutralAi));
+    }
+
+    @Test
+    void staticRemove_RemovesAiFromStaticList(){
+        Ai.remove(defaultAi);
+        assertFalse(Ai.getAllMobs().contains(defaultAi));
+    }
+
+    @Test
+    void staticRemoveAllMobs_RemovesAllMobs(){
+        initializeNeutralAi();
+        Ai.removeAllMobs();
+        assertTrue(Ai.getAllMobs().isEmpty());
+    }
+
+    @Test
     void canSwitchFromIdleToPatrollingAfterSufficientFrames(){
         for(int i=0; i < 3; i++){
             defaultAi.update();
@@ -54,29 +100,23 @@ public class AiTest {
 
     @Test
     void canSwitchFromPatrollingToIdle(){
-        for(int i=0; i < 3; i++){
-            defaultAi.update();
-        }
+        updateUntilPatrolling();
         Position customDestination = new Position(54, 48);
         defaultAi.setDestination(customDestination);
-        defaultAi.update();
+        updateUntilIdle();
         assertEquals(MobState.IDLE, defaultAi.getState());
     }
 
     @Test
     void patrollingSetsDestinationNotCurrentPosition(){
         Position currentPosition = defaultAi.getMob().getCurrentPosition();
-        for(int i=0; i < 3; i++){
-            defaultAi.update();
-        }
+        updateUntilPatrolling();
         assertNotEquals(currentPosition, defaultAi.getDestination());
     }
 
     @Test
     void patrollingMovesMob(){
-        for(int i=0; i < 3; i++){
-            defaultAi.update();
-        }
+        updateUntilPatrolling();
         Position customDestination = new Position(53, 53);
         defaultAi.setDestination(customDestination);
         defaultAi.update();
@@ -87,9 +127,7 @@ public class AiTest {
 
     @Test
     void onlyMovesMobTheirMovementSpeedPerFrame(){
-        for(int i=0; i < 3; i++){
-            defaultAi.update();
-        }
+        updateUntilPatrolling();
         Position customDestination = new Position(100, 50 );
         Position expectedMovementInOneFrame = new Position(50 + defaultAi.getMob().getMovementSpeed(),50);
         defaultAi.setDestination(customDestination);
@@ -144,12 +182,11 @@ public class AiTest {
     }
 
     void setUpResetScenario(){
-        when(defaultMockPlayer.getX()).thenReturn(40);
-        when(defaultMockPlayer.getY()).thenReturn(55);
+        setMockPosition_inAggroRadius();
         defaultAi.getMob().receiveAttack(13);
         defaultAi.update();
         defaultAi.update();
-        when(defaultMockPlayer.getY()).thenReturn(125);
+        setMockPosition_outOfCombatRadius();
         defaultAi.update();
     }
 
@@ -194,15 +231,13 @@ public class AiTest {
     @Test
     void resetBeginsIdleUponReturnToSpawnPoint(){
         setUpResetScenario();
-        defaultAi.update();
-        defaultAi.update();
+        updateUntilIdle();
         assertEquals(MobState.IDLE, defaultAi.getState());
     }
 
     @Test
     void hostileMobEntersCombatWithPlayerInsideItsAggroRange(){
-        when(defaultMockPlayer.getX()).thenReturn(53);
-        when(defaultMockPlayer.getY()).thenReturn(44);
+        setMockPosition_inAggroRadius();
         defaultAi.update();
         assertEquals(MobState.COMBAT, defaultAi.getState());
     }
@@ -216,9 +251,8 @@ public class AiTest {
         assertEquals(MobState.IDLE, neutralAi.getState());
     }
     @Test
-    void hostileMobDoesntEnterCombatWithPlayerOutsideItsAggroRange(){
-        when(defaultMockPlayer.getX()).thenReturn(defaultAi.getMob().getX());
-        when(defaultMockPlayer.getY()).thenReturn(defaultAi.getMob().getY() + defaultAi.getMob().getAggroRadius() + 1);
+    void hostileMobDoesNotEnterCombatWithPlayerOutsideItsAggroRange(){
+        setMockPosition_inCombatRadius_outOfAggroRadius();
         defaultAi.update();
         assertEquals(MobState.IDLE, defaultAi.getState());
     }
@@ -227,8 +261,7 @@ public class AiTest {
     void setUpHostileReactionToSocialAggroScenario(boolean hostile){
         PlaceholderMob secondaryMob = new PlaceholderMob(new Position (45, 43), 'p', 100, 3, hostile);
         Ai secondaryAi = new Ai(secondaryMob, defaultMockPlayer);
-        when(defaultMockPlayer.getX()).thenReturn(65);
-        when(defaultMockPlayer.getY()).thenReturn(32);
+        setMockPosition_inCombatRadius_outOfAggroRadius();
         Set<PlaceholderMob> mockSet = new HashSet<>();
         mockSet.add(secondaryMob);
         when(defaultMockPlayer.getEngagedMobs()).thenReturn(mockSet);
@@ -276,5 +309,224 @@ public class AiTest {
         assertEquals(MobState.IDLE, neutralAi.getState());
     }
 
+    @Test
+    void damagingMobToZeroHealthBeginsDeadState(){
+        defaultAi.getMob().receiveAttack(100);
+        defaultAi.update();
+        assertEquals(MobState.DEAD, defaultAi.getState());
+    }
 
+    @Test
+    void deadMobDespawnsAfterSufficientFrames(){
+        defaultAi.getMob().receiveAttack(100);
+        for (int i = 0; i <= 5; i++){
+            defaultAi.update();
+        }
+        assertFalse(Ai.getAllMobs().contains(defaultAi));
+    }
+
+    @Test
+    void a1_oneshotFromIdle(){
+        boolean correctPath = true;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(100);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
+
+    @Test
+    void a2_oneshotFromPatrollingAfterReset(){
+        boolean correctPath = true;
+        setMockPosition_inAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(150);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
+
+    @Test
+    void d1_oneshotFromPatrolling(){
+        boolean correctPath = true;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(113);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
+
+    @Test
+    void k1_afterReset_aggrozoneTriggersCombatFromIdleThenDies(){
+        boolean correctPath = true;
+        setMockPosition_inAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        setMockPosition_inAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(546);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
+
+    @Test
+    void k2_afterReset_receivingAttackTriggersCombatFromIdleThenDies(){
+        boolean correctPath = true;
+        setMockPosition_inCombatRadius_outOfAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(25);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        setMockPosition_inCombatRadius_outOfAggroRadius();
+        defaultAi.getMob().receiveAttack(20);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(120);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
+
+    @Test
+    void k3_afterReset_receivesAttackTriggeringCombatFromPatrollingThenDies(){
+        boolean correctPath = true;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        setMockPosition_inCombatRadius_outOfAggroRadius();
+        defaultAi.getMob().receiveAttack(10);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        setMockPosition_inCombatRadius_outOfAggroRadius();
+        defaultAi.getMob().receiveAttack(20);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(160);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
+
+    @Test
+    void k4_afterMultipleResets_aggrozoneTriggersCombatFromPatrollingThenDies(){
+        boolean correctPath = true;
+        Position spawn = defaultAi.getMob().getSpawnPoint();
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        defaultAi.setDestination(spawn);
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        setMockPosition_inCombatRadius_outOfAggroRadius();
+        defaultAi.getMob().receiveAttack(5);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        defaultAi.setDestination(spawn);
+        updateUntilIdle();
+        setMockPosition_inAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        setMockPosition_inAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        setMockPosition_outOfCombatRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.RESET)
+            correctPath = false;
+        updateUntilIdle();
+        if(defaultAi.getState() != MobState.IDLE)
+            correctPath = false;
+        updateUntilPatrolling();
+        if(defaultAi.getState() != MobState.PATROLLING)
+            correctPath = false;
+        setMockPosition_inAggroRadius();
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.COMBAT)
+            correctPath = false;
+        defaultAi.getMob().receiveAttack(143);
+        defaultAi.update();
+        if(defaultAi.getState() != MobState.DEAD)
+            correctPath = false;
+        assertTrue(correctPath);
+    }
 }

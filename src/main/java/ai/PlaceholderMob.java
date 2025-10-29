@@ -3,7 +3,11 @@ package ai;
 import gameObject.GameObject;
 import player.Player;
 
+
 public class PlaceholderMob extends GameObject {
+    private static final int SPAWN_RADIUS = 20;
+    private static final int AGGRO_RADIUS = 10;
+    private static final int COMBAT_RADIUS = 40;
     private final int maximumHealth;
     private final int movementSpeed;
     private int currentHealth;
@@ -13,9 +17,8 @@ public class PlaceholderMob extends GameObject {
     private boolean vulnerable;
     private Position currentPosition;
     private final Position spawnPoint;
-    private static final int SPAWN_RADIUS = 20;
-    private static final int AGGRO_RADIUS = 10;
-    private static final int COMBAT_RADIUS = 40;
+
+
 
 
     public PlaceholderMob(Position position, char objectSymbol, int maximumHealth, int movementSpeed, boolean hostile){
@@ -30,6 +33,8 @@ public class PlaceholderMob extends GameObject {
         combat = false;
         vulnerable = true;
     }
+
+
 
     public int getX(){
         return currentPosition.x;
@@ -118,6 +123,8 @@ public class PlaceholderMob extends GameObject {
         if (finalCurrentHealth > maximumHealth) {
             finalCurrentHealth = maximumHealth;
         }
+        else if(finalCurrentHealth < 0)
+            finalCurrentHealth = 0;
         this.currentHealth = finalCurrentHealth;
     }
 

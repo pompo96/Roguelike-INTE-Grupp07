@@ -2,15 +2,18 @@ package ai;
 
 import player.Player;
 
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Ai {
-    private final PlaceholderMob mob;
+    private static final List<Ai> ALL_MOBS = new ArrayList<>();
+    private PlaceholderMob mob;
     private final Player player;
     private MobState state;
     private int idleFrames;
+    private int deadFrames;
     private Position destination;
+
+
 
 
     public Ai(PlaceholderMob mob, Player player){
@@ -18,7 +21,27 @@ public class Ai {
         this.player = player;
         state = MobState.IDLE;
         idleFrames = 0;
+        deadFrames = 0;
         destination = mob.getSpawnPoint();
+        ALL_MOBS.add(this);
+    }
+
+    public static List<Ai> getAllMobs() {
+        return Collections.unmodifiableList(ALL_MOBS);
+    }
+
+    public static void removeAllMobs(){
+        for(Ai a: new ArrayList<>(ALL_MOBS))
+            remove(a);
+    }
+
+    public static void remove(Ai ai) {
+        ai.removeMobReference();
+        ALL_MOBS.remove(ai);
+    }
+
+    private void removeMobReference(){
+        mob = null;
     }
 
     public PlaceholderMob getMob() {
@@ -38,8 +61,20 @@ public class Ai {
     }
 
     public void update(){
-        if(mob.getCurrentHealth() < 1)
-            state = MobState.DEAD;
+        if(mob.getCurrentHealth() < 1) {
+            if(deadFrames == 0) {
+                state = MobState.DEAD;
+                player.disengageMob(mob);
+                deadFrames++;
+            }
+            else if(deadFrames == 5){
+                Ai.remove(this);
+
+            }
+            else
+                deadFrames++;
+
+        }
         else if(mob.getCombatAlert()){
             mob.setCombatAlert(false);
             beginCombat();
