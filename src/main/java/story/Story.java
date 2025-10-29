@@ -13,27 +13,43 @@ public class Story {
         FAILED
     }
 
+    public static class FightLog {
+        private List<String> logEntries;
 
-    public enum DungeonStage {
-        SEARCHING_FOR_KEY_FRAGMENT_1,
-        FRAGMENT_1_FOUND,
-        SEARCHING_FOR_KEY_FRAGMENT_2,
-        BOTH_FRAGMENTS_FOUND,
-        KEY_ASSEMBLED,
+        public FightLog() {
+            this.logEntries = new ArrayList<>();
+        }
+
+        public void logDamage(String source, int damage) {
+            logEntries.add("-" + damage + "HP from " + source);
+        }
+
+        public List<String> getLogEntries() {
+            return new ArrayList<>(logEntries);
+        }
+
+        public void clearLog() {
+            logEntries.clear();
+        }
+
+        public int getLogSize() {
+            return logEntries.size();
+        }
     }
 
+    public static abstract class Quest implements Player.Quest {
+        protected String id;
+        protected String name;
+        protected String description;
+        protected QuestState state;
+        protected FightLog fightLog;
 
-    public static class Quest implements Player.Quest {
-        private String id;
-        private String name;
-        private String description;
-        private QuestState state;
-
-        public Quest(String id, String name, String description) {
+        protected Quest(String id, String name, String description) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.state = QuestState.NOT_STARTED;
+            this.fightLog = new FightLog();
         }
 
         @Override
@@ -55,6 +71,10 @@ public class Story {
             return this.state;
         }
 
+        public FightLog getFightLog() {
+            return this.fightLog;
+        }
+
         public void startQuest() {
             if (this.state == QuestState.NOT_STARTED) {
                 this.state = QuestState.ACTIVE;
@@ -74,89 +94,231 @@ public class Story {
         }
     }
 
-
     public static class DungeonQuest extends Quest {
-        private DungeonStage currentStage;
-        private boolean hasFragment1;
-        private boolean hasFragment2;
-        private boolean hasCompleteKey;
+        private int enemiesKilled;
+        private int requiredEnemies;
+        private boolean doorUnlocked;
+        private boolean bossDefeated;
 
-
-        public DungeonQuest(String id, String name, String description) {
+        public DungeonQuest(String id, String name, String description, int requiredEnemies) {
             super(id, name, description);
-            this.currentStage = null;
-            this.hasFragment1 = false;
-            this.hasFragment2 = false;
-            this.hasCompleteKey = false;
+            this.enemiesKilled = 0;
+            this.requiredEnemies = requiredEnemies;
+            this.doorUnlocked = false;
+            this.bossDefeated = false;
+        }
+
+        public boolean unlockDungeonDoor(DungeonDoor door, boolean correctKeyhole) {
+            if (this.state == QuestState.ACTIVE && !doorUnlocked) {
+                if (correctKeyhole) {
+                    door.unlock();
+                    this.doorUnlocked = true;
+                    return true;
+                } else {
+                    this.onPlayerDeath();
+                    return false;
+                }
+            }
+            return false;
+        }
+        public void fightEnemy(Enemy enemy, Player player) {
+            if (this.state != QuestState.ACTIVE || !doorUnlocked) {
+                return;
+            }
+
+            int damage = enemy.getDamage();
+            player.updateCurrentLife(-damage);
+            fightLog.logDamage(enemy.getName(), damage);
+
+            enemy.takeDamage(enemy.getHealth());
+            if (enemy.isDead()) {
+                enemiesKilled++;
+            }
+        }
+
+        public boolean areAllEnemiesDead() {
+            return enemiesKilled >= requiredEnemies;
+        }
+
+        public boolean startBossFight() {
+            if (this.state == QuestState.ACTIVE && areAllEnemiesDead()) {
+                return true;
+            }
+            return false;
+        }
+
+        public boolean fightBoss(Boss boss, Player player) {
+            if (this.state != QuestState.ACTIVE || !areAllEnemiesDead()) {
+                return false;
+            }
+
+            int damage = boss.getDamage();
+            player.updateCurrentLife(-damage);
+            fightLog.logDamage(boss.getName(), damage);
+
+            boss.takeDamage(boss.getHealth());
+            if (boss.isDead()) {
+                this.bossDefeated = true;
+                this.completeQuest();
+                return true;
+            }
+            return false;
+        }
+
+        public void playerDiesFromEnemy(Player player) {
+            if (this.state == QuestState.ACTIVE) {
+                player.updateCurrentLife(-player.getCurrentLife());
+                this.onPlayerDeath();
+            }
+        }
+
+        public void playerDiesFromBoss(Player player) {
+            if (this.state == QuestState.ACTIVE) {
+                player.updateCurrentLife(-player.getCurrentLife());
+                this.onPlayerDeath();
+            }
+        }
+
+        public void onPlayerDeath() {
+            if (this.state == QuestState.ACTIVE) {
+                this.enemiesKilled = 0;
+                this.doorUnlocked = false;
+                this.bossDefeated = false;
+                this.fightLog.clearLog();
+            }
+        }
+
+        public int getEnemiesKilled() {
+            return this.enemiesKilled;
+        }
+
+        public boolean isDoorUnlocked() {
+            return this.doorUnlocked;
+        }
+    }
+
+    public static class TimedQuest extends Quest {
+        private int enemiesKilled;
+        private int requiredEnemies;
+        private int hpLost;
+        private int maxHpLoss;
+        private long startTime;
+        private long timeLimit;
+        private boolean timerStarted;
+
+        public TimedQuest(String id, String name, String description, int requiredEnemies, int maxHpLoss, long timeLimitSeconds) {
+            super(id, name, description);
+            this.enemiesKilled = 0;
+            this.requiredEnemies = requiredEnemies;
+            this.hpLost = 0;
+            this.maxHpLoss = maxHpLoss;
+            this.timeLimit = timeLimitSeconds * 1000;
+            this.timerStarted = false;
         }
 
         @Override
         public void startQuest() {
             super.startQuest();
-            if (this.getState() == QuestState.ACTIVE) {
-                this.currentStage = DungeonStage.SEARCHING_FOR_KEY_FRAGMENT_1;
+            this.startTime = System.currentTimeMillis();
+            this.timerStarted = true;
+        }
+
+        public void enemyAttacksPlayer(Enemy enemy, Player player) {
+            if (this.state != QuestState.ACTIVE) {
+                return;
+            }
+
+            if (isTimeExpired()) {
+                this.failQuest();
+                return;
+            }
+
+            int damage = enemy.getDamage();
+            player.updateCurrentLife(-damage);
+            hpLost += damage;
+            fightLog.logDamage(enemy.getName(), damage);
+
+            if (hpLost > maxHpLoss) {
+                this.failQuest();
             }
         }
 
-        public DungeonStage getCurrentStage() {
-            return this.currentStage;
-        }
-
-        public boolean findKeyFragment1(Area area) {
-            if (currentStage == DungeonStage.SEARCHING_FOR_KEY_FRAGMENT_1 && area.hasKeyFragment1()) {
-                this.hasFragment1 = true;
-                this.currentStage = DungeonStage.FRAGMENT_1_FOUND;
-                return true;
+        public void playerKillsEnemy(Enemy enemy) {
+            if (this.state != QuestState.ACTIVE) {
+                return;
             }
-            return false;
-        }
 
-        public void searchForFragment2() {
-            if (currentStage == DungeonStage.FRAGMENT_1_FOUND) {
-                this.currentStage = DungeonStage.SEARCHING_FOR_KEY_FRAGMENT_2;
+            if (isTimeExpired()) {
+                this.failQuest();
+                return;
             }
-        }
 
-        public boolean findKeyFragment2(Area area) {
-            if (currentStage == DungeonStage.SEARCHING_FOR_KEY_FRAGMENT_2 && area.hasKeyFragment2()) {
-                this.hasFragment2 = true;
-                this.currentStage = DungeonStage.BOTH_FRAGMENTS_FOUND;
-                return true;
-            }
-            return false;
-        }
+            enemy.takeDamage(enemy.getHealth());
+            if (enemy.isDead()) {
+                enemiesKilled++;
 
-        public boolean assembleKey() {
-            if (currentStage == DungeonStage.BOTH_FRAGMENTS_FOUND && hasFragment1 && hasFragment2) {
-                this.hasCompleteKey = true;
-                this.currentStage = DungeonStage.KEY_ASSEMBLED;
-                return true;
-            }
-            return false;
-        }
-
-        public void approachDungeonDoor() {
-            if (currentStage == DungeonStage.KEY_ASSEMBLED) {
-                this.currentStage = DungeonStage.AT_DUNGEON_DOOR;
+                if (enemiesKilled >= requiredEnemies && hpLost <= maxHpLoss && !isTimeExpired()) {
+                    this.completeQuest();
+                }
             }
         }
 
-        public boolean hasFragment1() {
-            return this.hasFragment1;
+        public boolean isTimeExpired() {
+            if (!timerStarted) {
+                return false;
+            }
+            return (System.currentTimeMillis() - startTime) > timeLimit;
         }
 
-        public boolean hasFragment2() {
-            return this.hasFragment2;
+        public void simulateTimeElapsed(long milliseconds) {
+            this.startTime -= milliseconds;
         }
 
-        public boolean hasCompleteKey() {
-            return this.hasCompleteKey;
+        public int getEnemiesKilled() {
+            return this.enemiesKilled;
+        }
+
+        public int getHpLost() {
+            return this.hpLost;
         }
     }
 
-    public interface Area {
-        boolean hasKeyFragment1();
-        boolean hasKeyFragment2();
+    public static class LostAndFoundQuest extends Quest {
+        private String requiredItemName;
+
+        public LostAndFoundQuest(String id, String name, String description, String requiredItemName) {
+            super(id, name, description);
+            this.requiredItemName = requiredItemName;
+        }
+
+        public boolean completeWithItem(Player player) {
+            if (this.state == QuestState.ACTIVE && player.hasItem(requiredItemName)) {
+                this.completeQuest();
+                player.questWasCompleted(this.id);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public interface DungeonDoor {
+        void unlock();
+    }
+
+    public interface Enemy {
+        void takeDamage(int damage);
+        int getDamage();
+        int getHealth();
+        String getName();
+        boolean isDead();
+    }
+
+    public interface Boss {
+        void takeDamage(int damage);
+        int getHealth();
+        int getDamage();
+        String getName();
+        boolean isDead();
     }
 
     public static class QuestItem {
@@ -168,32 +330,15 @@ public class Story {
             this.itemDescription = itemDescription;
         }
 
-        public String getItemName() {
-            return this.itemName;
-        }
-
-        public String getItemDescription() {
-            return this.itemDescription;
-        }
     }
 
     public static class NPC {
         private String name;
         private Quest quest;
-        private String requiredItemName;
 
-        public NPC(String name, Quest quest, String requiredItemName) {
+        public NPC(String name, Quest quest) {
             this.name = name;
             this.quest = quest;
-            this.requiredItemName = requiredItemName;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public Quest getQuest() {
-            return this.quest;
         }
 
         public void giveQuestToPlayer(Player player) {
@@ -203,16 +348,10 @@ public class Story {
             }
         }
 
-        public boolean completeQuestIfPlayerHasItem(Player player) {
-            if (player.hasItem(this.requiredItemName)) {
-                this.quest.completeQuest();
-                player.questWasCompleted(this.quest.getID());
-                return true;
+        public void rewardPlayer(Player player, int lifeBonus) {
+            if (this.quest.getState() == QuestState.COMPLETED) {
+                player.updateMaxLife(lifeBonus);
             }
-            return false;
         }
-
-
     }
-
 }
