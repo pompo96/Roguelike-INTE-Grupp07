@@ -145,7 +145,7 @@ public class Player extends GameObject {
         if(this.baseAttackPower < 0) this.baseAttackPower = 0;
     }
     public void updateAttackPowerEffectModifier(int effectModifier) {
-        this.attackPowerEffectModifier  = effectModifier;
+        this.attackPowerEffectModifier = effectModifier;
     }
 
 //    public int calculateDamage(){

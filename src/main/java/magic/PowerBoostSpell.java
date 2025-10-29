@@ -10,7 +10,7 @@ public class PowerBoostSpell implements Magic {
     public int getNumberOfUses(){
         return numberOfUses;
     }
-    public int castSpell(Player caster, Player target){
+    public void castSpell(Player caster, Player target){
         if (getNumberOfUses() == 0) {
             throw new IllegalStateException("Spell cannot be cast anymore!");
         }
@@ -20,7 +20,6 @@ public class PowerBoostSpell implements Magic {
 
         int attackPowerBoost = calculator.getCalculatedDamage();
         target.updateAttackPowerEffectModifier(attackPowerBoost);
-        return attackPowerBoost;
     }
     public void accept(SpellVisitor visitor, Player caster, Player target){
         visitor.visit(this, caster, target);

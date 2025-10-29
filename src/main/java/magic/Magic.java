@@ -6,7 +6,7 @@ public interface Magic {
     default int getBaseModifier(){return 10;}
     String getMagicType();
     int getNumberOfUses();
-    int castSpell(Player caster, Player target);
+    void castSpell(Player caster, Player target);
     void accept(SpellVisitor visitor, Player caster, Player target);
     boolean checkIfAbleToCast();
     int checkEnvironmentBoost();

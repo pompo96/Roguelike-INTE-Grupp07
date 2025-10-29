@@ -8,7 +8,7 @@ public class BuffedHealingSpell extends SpellDecorator{
         super(decoratedSpell);
     }
     @Override
-    public int castSpell(Player caster, Player target){
+    public void castSpell(Player caster, Player target){
         if (getNumberOfUses() == 0) {
             throw new IllegalStateException("Spell cannot be cast anymore!");
         }
@@ -16,8 +16,8 @@ public class BuffedHealingSpell extends SpellDecorator{
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int damageTaken = calculator.getCalculatedDamage();
-        target.updateCurrentLife(-damageTaken);
-        return damageTaken;
+        int healingAmount = calculator.getCalculatedDamage();
+        target.updateCurrentLife(healingAmount);
+        target.updateMaxLife(healingAmount);
     }
 }

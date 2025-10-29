@@ -7,7 +7,7 @@ public class BuffedElectricalSpell extends SpellDecorator{
         super(decoratedSpell);
     }
     @Override
-    public int castSpell(Player caster, Player target){
+    public void castSpell(Player caster, Player target){
         if (getNumberOfUses() == 0) {
             throw new IllegalStateException("Spell cannot be cast anymore!");
         }
@@ -19,7 +19,6 @@ public class BuffedElectricalSpell extends SpellDecorator{
         target.updateCurrentLife(-damageTaken);
 
         int decreaseSpeedAmount = 2;
-        target.updateMovementSpeed(decreaseSpeedAmount);
-        return damageTaken;
+        target.updateMovementSpeed(-decreaseSpeedAmount);
     }
 }

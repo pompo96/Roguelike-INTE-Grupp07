@@ -1,5 +1,6 @@
 package magic;
 
+import equipment.Item;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.Test;
@@ -7,8 +8,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import player.Player;
 import race.Elf;
 import race.Dwarf;
+import race.Human;
+import race.Race;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -39,21 +44,20 @@ class MagicTest {
             "Dwarf, 5"     // mindre damage
     })
     void fireSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
 
-        // Returnera rätt typ av ras beroende på strängvärde
+        Race race;
         switch (raceName) {
-            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
-            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            case "Elf" -> race = new Elf();
+            case "Dwarf" -> race = new Dwarf();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-
+        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        int healthBeforeSpellCast = target.getCurrentLife();
         FireSpell fireSpell = new FireSpell();
-        int actualDamage = fireSpell.castSpell(caster, target);
+        fireSpell.castSpell(caster, target);
 
-        assertEquals(expectedDamage, actualDamage,
-                "FireSpell ska göra korrekt damage beroende på ras");
+        assertEquals(healthBeforeSpellCast - expectedDamage, target.getCurrentLife(), "FireSpell ska göra korrekt damage beroende på ras");
     }
 
     @ParameterizedTest(name = "IceSpell mot {0} ska ge {1} damage")
@@ -62,49 +66,52 @@ class MagicTest {
             "Elf, 5"
     })
     void iceSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
 
+        Race race;
         switch (raceName) {
-            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
-            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            case "Elf" -> race = new Elf();
+            case "Dwarf" -> race = new Dwarf();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-
+        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        int healthBeforeSpellCast = target.getCurrentLife();
         IceSpell iceSpell = new IceSpell();
-        int actualDamage = iceSpell.castSpell(caster, target);
+        iceSpell.castSpell(caster, target);
 
-        assertEquals(expectedDamage, actualDamage,
-                "IceSpell ska göra korrekt damage beroende på ras");
+        assertEquals(healthBeforeSpellCast - expectedDamage, target.getCurrentLife(), "IceSpell ska göra korrekt damage beroende på ras");
     }
-    @ParameterizedTest(name = "IceSpell mot {0} ska ge {1} damage")
+
+    @ParameterizedTest(name = "ElectricalSpell mot {0} ska ge {1} damage")
     @CsvSource({
             "Dwarf, 5",
             "Elf, 5"
     })
-    void electricSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage){
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
-
+    void electricSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Race race;
         switch (raceName) {
-            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
-            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            case "Elf" -> race = new Elf();
+            case "Dwarf" -> race = new Dwarf();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
+        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        int healthBeforeSpellCast = target.getCurrentLife();
         ElectricSpell electricSpell = new ElectricSpell();
-        int actualDamage = electricSpell.castSpell(caster, target);
-        assertEquals(expectedDamage, actualDamage);
+        electricSpell.castSpell(caster, target);
+        assertEquals(healthBeforeSpellCast - expectedDamage, target.getCurrentLife());
     }
+
     @Test
-    void buffedElectricalSpell_DecreasesTargetSpeed(){
+    void buffedElectricalSpell_DecreasesTargetSpeed() {
         BuffedElectricalSpell buffedElectricalSpell = new BuffedElectricalSpell(new ElectricSpell());
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
-        when(target.getMovementSpeed()).thenReturn(8); //Implementera riktiga player objekt så kommer det fungera
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
 
         buffedElectricalSpell.castSpell(caster, target);
         assertEquals(8, target.getMovementSpeed(), "Din movement speed är fel mängd");
     }
+
     @Test
     void lightEffect_WorksWhenDark() {
         Magic fireSpell = new FireSpell();
@@ -120,47 +127,58 @@ class MagicTest {
             "Dwarf, 5", //mindre healing
             "Elf, 20" //mer healing
     })
-    void healingSpell_HealsHealthPool(String raceName, int expectedHealthIncrease){
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
-
+    void healingSpell_HealsHealthPool(String raceName, int expectedHealthIncrease) {
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Race race;
         switch (raceName) {
-            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
-            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            case "Elf" -> race = new Elf();
+            case "Dwarf" -> race = new Dwarf();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-
+        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        int healthDecrease = -20;
+        target.updateCurrentLife(healthDecrease);
+        int currentTargetHealth = target.getCurrentLife();
         Magic healingSpell = new HealingSpell();
-        int actualHealing = healingSpell.castSpell(caster, target);
-        assertEquals(actualHealing, expectedHealthIncrease, "HealingSpell ska uppdatera en spelares liv korrekt beroende på ras");
+        healingSpell.castSpell(caster, target);
+        assertEquals(currentTargetHealth + expectedHealthIncrease, target.getCurrentLife(), "HealingSpell ska uppdatera en spelares liv korrekt beroende på ras");
     }
+
     @ParameterizedTest(name = "HealingSpell mot {0} ska öka dens liv med {1}")
     @CsvSource({
             "Dwarf, 5", //mindre healing
             "Elf, 20" //mer healing
     })
-    void buffedHealingSpell_HealsHealthPoolAndIncreasesMaxHealth(String raceName, int expectedHealthIncrease){
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
-
+    void buffedHealingSpell_HealsHealthPoolAndIncreasesMaxHealth(String raceName, int expectedHealthIncrease) {
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Race race;
         switch (raceName) {
-            case "Elf" -> when(target.getRace()).thenReturn(new Elf());
-            case "Dwarf" -> when(target.getRace()).thenReturn(new Dwarf());
+            case "Elf" -> race = new Elf();
+            case "Dwarf" -> race = new Dwarf();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
+        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        int healthDecrease = -20;
+        target.updateCurrentLife(healthDecrease);
+        int currentTargetMaxHealth = target.getMaxLife();
+        int currentTargetHealth = target.getCurrentLife();
 
         Magic buffedHealingSpell = new BuffedHealingSpell(new HealingSpell());
-        int actualHealing = buffedHealingSpell.castSpell(caster, target);
-        assertEquals(actualHealing, expectedHealthIncrease, "HealingSpell ska uppdatera en spelares liv och maximala liv korrekt beroende på ras");
+        buffedHealingSpell.castSpell(caster, target);
+        assertEquals(currentTargetMaxHealth + expectedHealthIncrease, target.getMaxLife(), "Max hp kan inte öka mer");
+        assertEquals(currentTargetHealth + expectedHealthIncrease, target.getCurrentLife(), "currentHealth kan inte öka mer");
     }
-    void powerBoostSpell_IncreasesAttackPower(){
+
+    @Test
+    void defaultPowerBoostSpell_IncreasesAttackPower() {
         PowerBoostSpell powerBoostSpell = new PowerBoostSpell();
 
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
 
-        int expectedPowerBoost = powerBoostSpell.castSpell(caster, target);
-        assertEquals(expectedPowerBoost, 110, "Players attack power är fel mängd");
+        powerBoostSpell.castSpell(caster, target);
+        int expectedPowerBoost = target.getAttackPowerEffectModifier();
+        assertEquals(expectedPowerBoost, 20, "Players attack power är fel mängd");
     }
 }
 

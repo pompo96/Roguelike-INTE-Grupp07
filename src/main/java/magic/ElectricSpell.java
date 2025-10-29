@@ -16,7 +16,7 @@ public class ElectricSpell implements Magic{
     }
 
     @Override
-    public int castSpell(Player caster, Player target) {
+    public void castSpell(Player caster, Player target) {
         if (getNumberOfUses() == 0) {
             throw new IllegalStateException("Spell cannot be cast anymore!");
         }
@@ -26,7 +26,6 @@ public class ElectricSpell implements Magic{
 
         int damageTaken = calculator.getCalculatedDamage();
         target.updateCurrentLife(-damageTaken);
-        return damageTaken;
     }
     @Override
     public void accept(SpellVisitor visitor, Player caster, Player target){

@@ -27,8 +27,8 @@ public abstract class SpellDecorator implements Magic {
         return decoratedSpell.checkEnvironmentBoost();
     }
     @Override
-    public int castSpell(Player caster, Player target) {
-        return decoratedSpell.castSpell(caster, target);
+    public void castSpell(Player caster, Player target) {
+        decoratedSpell.castSpell(caster, target);
     }
 
     @Override
