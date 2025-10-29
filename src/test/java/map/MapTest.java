@@ -1,7 +1,9 @@
 package map;
 
+import equipment.Item;
 import map.generation.GenerationStrategy;
 import map.generation.SimpleFillStrategy;
+import map.pathfinding.WalkablePathFinder;
 import map.tiles.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,27 +12,23 @@ import testutils.MockFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests structural and content integrity of the DungeonMap itself.
- * Ensures that the map grid is fully populated, borders are correct,
- * and entrance/exit tiles are present and valid.
- */
 public class MapTest {
     private DungeonMap map;
+    private final int DEFAULT_HEIGHT = 10;
+    private final int DEFAULT_WIDTH = 12;
+    private DungeonMapManager mapManager;
 
     @BeforeEach
     void setUp() {
         GenerationStrategy strategy = new SimpleFillStrategy();
         Player mockPlayer = MockFactory.createMockPlayer();
-        DungeonMapManager dungeonMapManager = new DungeonMapManager(mockPlayer);
-        dungeonMapManager.makeMap(10, 10, strategy);
-        map = dungeonMapManager.getMap();
+        mapManager =  new DungeonMapManager(mockPlayer);
+        mapManager.createMap(DEFAULT_HEIGHT, DEFAULT_WIDTH, strategy);
+        map = mapManager.getMap();
     }
 
     @Test
     void testMapHasCorrectDimensions() {
-        int height = 10;
-        int width = 10;
         int colLength = 0;
         int gridSize = 0;
         int rowLength;
@@ -39,13 +37,14 @@ public class MapTest {
             colLength++;
             for (Tile tile : row) {
                 gridSize++;
+                tile.notify(); //Tile being unused got warnings...
             }
         }
         rowLength = gridSize / colLength;
 
-        assertEquals(height, colLength);
-        assertEquals(width, rowLength);
-        assertEquals((height*width), gridSize);
+        assertEquals(DEFAULT_HEIGHT, colLength);
+        assertEquals(DEFAULT_WIDTH, rowLength);
+        assertEquals((DEFAULT_HEIGHT*DEFAULT_WIDTH), gridSize);
     }
 
     @Test
@@ -88,14 +87,60 @@ public class MapTest {
     }
 
     @Test
-    public void testSetAndClearTileContainer(){
-
+    public void testSetAndClearTileContainer() {
+        Item mockObject = MockFactory.createMockWeapon("mockSword", 50);
+        int y = 2;
+        int x = 3;
+        map.spawnAtLocation(y, x, mockObject);
+        Tile targetTile = map.getTileGrid()[y][x];
+        assertNotNull(targetTile.getTileContainer());
+        assertEquals(mockObject, targetTile.getTileContainer());
+        targetTile.clearTileContainer();
+        assertNull(targetTile.getTileContainer());
     }
 
     @Test
-    public void testDrawMap(){
+    void testDrawMap() {
+        var outContent = new java.io.ByteArrayOutputStream();
+        var originalOut = System.out;
+        System.setOut(new java.io.PrintStream(outContent));
+        map.drawMap();
+        System.setOut(originalOut);
+        String actual = outContent.toString().trim();
 
+        var oracleOut = new java.io.ByteArrayOutputStream();
+        System.setOut(new java.io.PrintStream(oracleOut));
+        drawMap(map);
+        System.setOut(originalOut);
+        String expected = oracleOut.toString().trim();
+        assertFalse(actual.isEmpty());
+        assertEquals(expected, actual);
     }
+
+
+    @Test
+    public void testSpawnPlayerAtEntrance() {
+        Player player = mapManager.getPlayer();
+        map.spawnPlayerAtEntrance(player);
+
+
+        WalkablePathFinder pathFinder = new WalkablePathFinder(map, '⨇', 'E');
+        int[] coords = pathFinder.getWalkableTile(map.getEntrance());
+
+        assertEquals(coords[0], player.getY());
+        assertEquals(coords[1], player.getX());
+    }
+
+    @Test
+    public void testSpawnPlayerAtExit() {
+        Player player = mapManager.getPlayer();
+        map.spawnPlayerAtExit(player);
+        WalkablePathFinder pathFinder = new WalkablePathFinder(map, '⨇', 'E');
+        int[] coords = pathFinder.getWalkableTile(map.getExit());
+        assertEquals(coords[0], player.getY());
+        assertEquals(coords[1], player.getX());
+    }
+
     private boolean isBorder(int y, int x, int mapHeight, int mapWidth){
         boolean isTopWall = y == 0;
         boolean isBottomWall = y == mapHeight - 1;
@@ -103,5 +148,17 @@ public class MapTest {
         boolean isRightWall = x == mapWidth - 1;
 
         return isTopWall || isBottomWall || isLeftWall || isRightWall;
+    }
+
+
+    private void drawMap(DungeonMap map) {
+        StringBuilder sb = new StringBuilder();
+        for(Tile[] row : map.getTileGrid()) {
+            for(Tile tile : row){
+                sb.append(tile.toString());
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb);
     }
 }

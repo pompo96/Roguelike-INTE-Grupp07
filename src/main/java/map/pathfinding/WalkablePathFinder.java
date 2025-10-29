@@ -52,17 +52,14 @@ public class WalkablePathFinder {
         List<Coordinate> neighbors = new ArrayList<>();
         for (Directions directions : Directions.values()) {
             Coordinate next = position.move(directions);
-            if (isWithinBounds(next) && map.getTileGrid()[next.column()][next.row()].isWalkable()) {
+            if (map.getTileGrid()[next.column()][next.row()].isWalkable()) {
                 neighbors.add(next);
             }
         }
         return neighbors;
     }
 
-    private boolean isWithinBounds(Coordinate coordinate) {
-        return coordinate.column() >= 0 && coordinate.column() < map.getHeight() &&
-                coordinate.row() >= 0 && coordinate.row() < map.getWidth();
-    }
+
 
     private Coordinate findSymbolCoordinate(char symbol) {
         for (int column = 0; column < map.getHeight(); column++) {

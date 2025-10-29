@@ -1,14 +1,13 @@
 package map;
 
-import equipment.Item;
 import gameObject.GameObject;
 import map.pathfinding.Directions;
 import map.pathfinding.WalkablePathFinder;
 import map.tiles.Tile;
 import player.Player;
 
-public class    DungeonMap {
-    private Tile[][] map;
+public class DungeonMap {
+    private final Tile[][] map;
     private Tile entrance;
     private Tile exit;
     private final int height;
@@ -48,7 +47,7 @@ public class    DungeonMap {
         this.exit = exit;
     }
 
-    public void drawMap() { //test -
+    public void drawMap() {
         StringBuilder sb = new StringBuilder();
         for(Tile[] row : map){
             for(Tile tile : row){
@@ -71,6 +70,7 @@ public class    DungeonMap {
         player.setY(tile.getY());
         player.setX(tile.getX());
     }
+
     public void spawnPlayerAtExit(Player player) { //test -
         Tile tile = getFirstWalkableNeighbour(exit);
         tile.setTileContainer(player);
@@ -79,19 +79,18 @@ public class    DungeonMap {
     }
 
     private Tile getFirstWalkableNeighbour(Tile tile){
-        WalkablePathFinder pathFinder = new WalkablePathFinder(this, 'x', 'x');
+        WalkablePathFinder pathFinder = new WalkablePathFinder(this, '⨇', 'E');
         int[] neighbourCoords = pathFinder.getWalkableTile(tile);
         return map[neighbourCoords[0]][neighbourCoords[1]];
     }
 
     public boolean movePlayer(Directions dir, Player player) {
-        if (player == null) return false;
 
         int oldY = player.getY();
         int oldX = player.getX();
 
-        int newY = oldY + dir.getRow();
-        int newX = oldX + dir.getColumn();
+        int newY = oldY + dir.getColumn();
+        int newX = oldX + dir.getRow();
 
         if (newY < 0 || newY >= getHeight() || newX < 0 || newX >= getWidth()) {
             return false;
@@ -103,9 +102,10 @@ public class    DungeonMap {
             return false;
         }
 
-        if(targetTile.getTileContainer() instanceof Item){
-            player.equipItem((Item) targetTile.getTileContainer());
-        }
+//      Prolly not the maps responsibility??
+//        if(targetTile.getTileContainer() instanceof Item){
+//            player.equipItem((Item) targetTile.getTileContainer());
+//        }
 
         Tile oldTile = map[oldY][oldX];
         oldTile.clearTileContainer();

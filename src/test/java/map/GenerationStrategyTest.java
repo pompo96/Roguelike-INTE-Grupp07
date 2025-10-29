@@ -25,7 +25,7 @@ public class GenerationStrategyTest {
         strategy = new SimpleFillStrategy();
         Player mockPlayer = MockFactory.createMockPlayer();
         dungeonMapManager = new DungeonMapManager(mockPlayer);
-        dungeonMapManager.makeMap(10, 10, strategy);
+        dungeonMapManager.createMap(10, 10, strategy);
     }
 
     @Test

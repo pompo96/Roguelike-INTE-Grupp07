@@ -1,6 +1,5 @@
 package map;
 import equipment.Item;
-import gameObject.GameObject;
 import map.pathfinding.Directions;
 import map.generation.GenerationStrategy;
 import map.generation.SimpleFillStrategy;
@@ -50,24 +49,52 @@ public class DungeonMapManagerTest {
         strategy = new SimpleFillStrategy();
         mockPlayer = MockFactory.createMockPlayer();
         dungeonMapManager = new DungeonMapManager(mockPlayer);
-        dungeonMapManager.makeMap(10, 10, strategy);
+        dungeonMapManager.createMap(10, 10, strategy);
 
     }
 
+    @ParameterizedTest
+    @CsvSource(value = { "10,5", "5,10", "5,5", "50,73","100,100"})
+    public void testValidDimensionsCreatesMap(int height, int width) {
+        assertTrue(dungeonMapManager.createMap(height, width, strategy));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "4,10", "10,4", "-1,10", "10,-1","101,10","10,101"})
+    public void testInvalidDimensionsThrowsException(int height, int width) {
+        assertThrows(IllegalArgumentException.class, () -> dungeonMapManager.createMap(height, width, strategy));
+    }
+
     @Test
-    public void testPlayerMovement_UpdatesTilesCorrectly() {
-        dungeonMapManager.setPlayer(mockPlayer);
+    public void testPlayerMovement_UpdatesPlayerCoordinates() {
+        dungeonMapManager.spawnPlayerAt(5, 5);
+
+        for (Directions dir : Directions.values()) {
+            int oldY = mockPlayer.getY();
+            int oldX = mockPlayer.getX();
+
+            boolean moved = dungeonMapManager.movePlayer(dir);
+
+            int expectedY = oldY + dir.getColumn();
+            int expectedX = oldX + dir.getRow();
+
+            assertTrue(moved);
+            assertEquals(expectedY, mockPlayer.getY());
+            assertEquals(expectedX, mockPlayer.getX());
+        }
+    }
+
+    @Test
+    public void testPlayerMovement_AllMoveableDirections() {
         dungeonMapManager.spawnPlayerAt(5, 5);
 
         for (Directions dir : Directions.values()) {
             DungeonMap map = dungeonMapManager.getMap();
             Tile[][] grid = map.getTileGrid();
-
             int oldY = mockPlayer.getY();
             int oldX = mockPlayer.getX();
 
-            boolean moved = dungeonMapManager.movePlayer(dir);
-            assertTrue(moved);
+            assertTrue(dungeonMapManager.movePlayer(dir));
 
             int newY = mockPlayer.getY();
             int newX = mockPlayer.getX();
@@ -80,111 +107,60 @@ public class DungeonMapManagerTest {
         }
     }
 
+
     @Test
-    public void testPlayerMovement_UpdatesPlayerCoordinates() {
-        dungeonMapManager.setPlayer(mockPlayer);
-        dungeonMapManager.spawnPlayerAt(5, 5);
-
-        for (Directions dir : Directions.values()) {
-            int oldY = mockPlayer.getY();
-            int oldX = mockPlayer.getX();
-
-            boolean moved = dungeonMapManager.movePlayer(dir);
-
-            int expectedY = oldY + dir.getRow();
-            int expectedX = oldX + dir.getColumn();
-
-            assertTrue(moved);
-            assertEquals(expectedY, mockPlayer.getY());
-            assertEquals(expectedX, mockPlayer.getX());
-        }
+    void playerWalksOverItem_ItemIsLooted() {
+        Item mockSword = MockFactory.createMockWeapon("newSword", 100);
+        dungeonMapManager.spawnPlayerAt(3, 3);
+        dungeonMapManager.placeObjectAt(4, 3, mockSword);
+        Tile tile = dungeonMapManager.getMap().getTileGrid()[4][3];
+        assertEquals(tile.getTileContainer(), mockSword);
+        dungeonMapManager.movePlayer(Directions.SOUTH);
+        assertEquals(tile.getTileContainer(), mockPlayer);
     }
-
-
-    @ParameterizedTest
-    @CsvSource(value = { "0,10", "10, 0"})
-    public void nonPositiveDimensions_ThrowsException(int height, int width) {
-        assertThrows(IllegalArgumentException.class, () -> dungeonMapManager.makeMap(height, width, strategy));
-    }
-
-//    //broken due to shitty class hierarchy
-//    @Test
-//    void playerWalksOverItem_GetsNewItem() {
-//        dungeonMapManager.setPlayer(mockPlayer);
-//
-//        dungeonMapManager.spawnPlayerAt(3, 3);
-//        dungeonMapManager.placeObjectAt(4, 3, MockFactory.createMockWeapon("newSword", 100));
-//        dungeonMapManager.movePlayer(Directions.SOUTH);
-//
-//        assertTrue(mockPlayer.hasItem("newSword"));
-//    }
 
     @Test
     public void playerWalksOntoEntrance_FloorZero_DoesNotChangeFloor() {
-        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
-        GenerationStrategy strategy = new SimpleFillStrategy();
-        manager.makeMap(5, 5, strategy);
-        Player mockPlayer = MockFactory.createMockPlayer();
-        manager.setPlayer(mockPlayer);
-
-        int before = manager.getCurrentFloor();
-
-        boolean moved = manager.priorMap();
-
+        dungeonMapManager.createMap(5, 5, strategy);
+        int before = dungeonMapManager.getCurrentFloor();
+        boolean moved = dungeonMapManager.priorMap();
         assertFalse(moved);
-        assertEquals(before, manager.getCurrentFloor());
+        assertEquals(before, dungeonMapManager.getCurrentFloor());
     }
 
     @Test
     public void playerWalksOntoEntrance_FloorGreaterThanZero_MovesUp() {
-        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
-        GenerationStrategy strategy = new SimpleFillStrategy();
-        manager.makeMap(5, 5, strategy);
-        manager.makeMap(5, 5, strategy);
-        manager.setPlayer(MockFactory.createMockPlayer());
+        dungeonMapManager.createMap(5, 5, strategy);
+        dungeonMapManager.createMap(5, 5, strategy);
 
-
-        manager.nextMap();
-        assertEquals(1, manager.getCurrentFloor());
-
-        boolean moved = manager.priorMap();
-
-        assertTrue(moved);
-        assertEquals(0, manager.getCurrentFloor());
+        assertEquals(1, dungeonMapManager.getCurrentFloor());
+        assertTrue(dungeonMapManager.nextMap());
+        assertEquals(2, dungeonMapManager.getCurrentFloor());
+        assertTrue(dungeonMapManager.priorMap());
+        assertEquals(1, dungeonMapManager.getCurrentFloor());
     }
 
     @Test
     public void playerWalksOntoExit_NotLastFloor_MovesDown() {
-        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
-        GenerationStrategy strategy = new SimpleFillStrategy();
-        manager.makeMap(5, 5, strategy);
-        manager.makeMap(5, 5, strategy);
-        manager.makeMap(5, 5, strategy);
-        manager.setPlayer(MockFactory.createMockPlayer());
+        dungeonMapManager.createMap(10, 15, strategy);
 
-        assertEquals(0, manager.getCurrentFloor());
-        boolean moved = manager.nextMap();
-
-        assertTrue(moved);
-        assertEquals(1, manager.getCurrentFloor());
+        assertEquals(1, dungeonMapManager.getCurrentFloor());
+        assertTrue(dungeonMapManager.nextMap());
+        assertEquals(2, dungeonMapManager.getCurrentFloor());
     }
 
-    @Test
-    public void playerWalksOntoExit_LastFloor_EndsDungeon() {
-        DungeonMapManager manager = new DungeonMapManager(mockPlayer);
-        GenerationStrategy strategy = new SimpleFillStrategy();
-        manager.makeMap(5, 5, strategy);
-        manager.makeMap(5, 5, strategy);
-        manager.setPlayer(MockFactory.createMockPlayer());
+    @ParameterizedTest
+    @CsvSource(value = {"1,2,3"})
+    public void playerWalksOntoExit_LastFloor_EndsDungeon(int floorOne, int floorTwo, int floorThree) {
+        dungeonMapManager.createMap(5, 5, strategy);
+        dungeonMapManager.createMap(5, 5, strategy);
 
-        manager.nextMap();
-        assertEquals(1, manager.getCurrentFloor());
-
-        boolean moved = manager.nextMap();
-
-        assertFalse(moved);
-        assertTrue(manager.isDungeonCompleted());
+        assertEquals(floorOne, dungeonMapManager.getCurrentFloor());
+        assertTrue(dungeonMapManager.nextMap());
+        assertEquals(floorTwo, dungeonMapManager.getCurrentFloor());
+        assertTrue(dungeonMapManager.nextMap());
+        assertEquals(floorThree, dungeonMapManager.getCurrentFloor());
+        assertFalse(dungeonMapManager.nextMap());
+        assertTrue(dungeonMapManager.isDungeonCompleted());
     }
-
-
 }

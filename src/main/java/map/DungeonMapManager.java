@@ -8,24 +8,32 @@ import map.tiles.DefaultTileFactory;
 import player.Player;
 
 public class DungeonMapManager {
+    private static final int MIN_MAP_HEIGHT = 5;
+    private static final int MIN_MAP_WIDTH = 5;
+    private static final int MAX_MAP_HEIGHT = 100;
+    private static final int MAX_MAP_WIDTH = 100;
+
     private final DefaultTileFactory factory;
     private final Map<Integer, DungeonMap> maps;
     private int currentFloor;
-    private Player player;
+    private final Player player;
     private boolean dungeonCompleted = false;
 
     public DungeonMapManager(Player player) {
         this.factory = new DefaultTileFactory(this);
         this.maps = new HashMap<>();
-        this.currentFloor = 0;
+        this.currentFloor = 1;
         this.player = player;
     }
 
-    public void makeMap(int height, int width, GenerationStrategy strategy) throws IllegalArgumentException {
-        if(height < 1 || width < 1) {
+    public boolean createMap(int height, int width, GenerationStrategy strategy) throws IllegalArgumentException {
+        if(height < MIN_MAP_HEIGHT || width < MIN_MAP_WIDTH || height > MAX_MAP_HEIGHT || width > MAX_MAP_WIDTH) {
             throw new IllegalArgumentException();
         }
-        maps.put(currentFloor, strategy.generate(factory, height, width));
+        int mapKeyIndex = maps.size()+1;
+
+        maps.put(mapKeyIndex, strategy.generate(factory, height, width));
+        return maps.containsKey(mapKeyIndex);
     }
 
     public DungeonMap getMap(){
@@ -38,34 +46,32 @@ public class DungeonMapManager {
     }
 
     public boolean movePlayer(Directions dir) {
-        if (player == null) throw new IllegalStateException("Player not set");
         DungeonMap map = getMap();
         return map.movePlayer(dir, player);
     }
 
     public boolean nextMap() {
-        if(currentFloor + 1 < maps.size()) {
+        if(currentFloor == maps.size()) {
+            dungeonCompleted = true;
+            return false;
+        }
             currentFloor++;
             maps.get(currentFloor).spawnPlayerAtEntrance(player);
             maps.get(currentFloor).drawMap();
             return true;
-        }else{
-            dungeonCompleted = true;
-            return false;
-        }
+
     }
 
     public boolean priorMap() {
-        if(currentFloor > 0) {
+        if(currentFloor == 1) {
+            return false;
+        }
             currentFloor--;
             maps.get(currentFloor).spawnPlayerAtExit(player);
             maps.get(currentFloor).drawMap();
             return true;
-        }else{
-            return false;
-        }
-    }
 
+    }
 
     public boolean isDungeonCompleted() {
         return dungeonCompleted;
@@ -75,9 +81,6 @@ public class DungeonMapManager {
         return player;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
     public void placeObjectAt(int y, int x, GameObject object) {
         getMap().spawnAtLocation(y, x, object);
     }
