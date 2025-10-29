@@ -29,15 +29,19 @@ public class Utrustning implements Item{
     public boolean getValue() {
         return itemExists;
     }
+
     public int getID() {
         return id;
     }
+
     public String getRealName() {
         return name;
     }
+
     public String getName() {
         return type;
     }
+
     public int getCustomValue(){
         return customValue;
     }
