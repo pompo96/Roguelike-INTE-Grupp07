@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
  * Questlog list(questObjects)
  */
-
 public class PlayerTests {
     Player defaultPlayer;
     Race mockRace;

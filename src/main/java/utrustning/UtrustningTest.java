@@ -45,6 +45,7 @@ public class UtrustningTest {
         assertEquals("armour", armour.getName());
     }
 
+
     @Test
     public void shoesHadIDNameStatsAndTypeBasic(){
         Utrustning shoes = new Utrustning("shoes", 3,"Sandals");
