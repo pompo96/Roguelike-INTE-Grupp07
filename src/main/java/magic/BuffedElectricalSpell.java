@@ -15,7 +15,7 @@ public class BuffedElectricalSpell extends SpellDecorator{
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int damageTaken = calculator.getCalculatedDamage();
+        int damageTaken = calculator.getCalculatedModifier();
         target.updateCurrentLife(-damageTaken);
 
         int decreaseSpeedAmount = 2;

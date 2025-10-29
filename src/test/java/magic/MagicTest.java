@@ -10,10 +10,8 @@ import race.Elf;
 import race.Dwarf;
 import race.Human;
 import race.Race;
-
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,7 +39,8 @@ class MagicTest {
     @ParameterizedTest(name = "FireSpell mot {0} ska ge {1} damage")
     @CsvSource({
             "Elf, 20",     // extra damage
-            "Dwarf, 5"     // mindre damage
+            "Dwarf, 5", // mindre damage
+            "Human, 10"
     })
     void fireSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
         Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -50,6 +49,7 @@ class MagicTest {
         switch (raceName) {
             case "Elf" -> race = new Elf();
             case "Dwarf" -> race = new Dwarf();
+            case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
         Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -63,7 +63,8 @@ class MagicTest {
     @ParameterizedTest(name = "IceSpell mot {0} ska ge {1} damage")
     @CsvSource({
             "Dwarf, 20",
-            "Elf, 5"
+            "Elf, 5",
+            "Human, 10"
     })
     void iceSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
         Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -72,6 +73,7 @@ class MagicTest {
         switch (raceName) {
             case "Elf" -> race = new Elf();
             case "Dwarf" -> race = new Dwarf();
+            case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
         Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -85,7 +87,8 @@ class MagicTest {
     @ParameterizedTest(name = "ElectricalSpell mot {0} ska ge {1} damage")
     @CsvSource({
             "Dwarf, 5",
-            "Elf, 5"
+            "Elf, 5",
+            "Human, 10"
     })
     void electricSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
         Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -93,6 +96,7 @@ class MagicTest {
         switch (raceName) {
             case "Elf" -> race = new Elf();
             case "Dwarf" -> race = new Dwarf();
+            case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
         Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -125,7 +129,8 @@ class MagicTest {
     @ParameterizedTest(name = "HealingSpell mot {0} ska öka dens liv med {1}")
     @CsvSource({
             "Dwarf, 5", //mindre healing
-            "Elf, 20" //mer healing
+            "Elf, 20", //mer healing
+            "Human, 10"
     })
     void healingSpell_HealsHealthPool(String raceName, int expectedHealthIncrease) {
         Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -133,6 +138,7 @@ class MagicTest {
         switch (raceName) {
             case "Elf" -> race = new Elf();
             case "Dwarf" -> race = new Dwarf();
+            case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
         Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -147,7 +153,8 @@ class MagicTest {
     @ParameterizedTest(name = "HealingSpell mot {0} ska öka dens liv med {1}")
     @CsvSource({
             "Dwarf, 5", //mindre healing
-            "Elf, 20" //mer healing
+            "Elf, 20", //mer healing
+            "Human, 10"
     })
     void buffedHealingSpell_HealsHealthPoolAndIncreasesMaxHealth(String raceName, int expectedHealthIncrease) {
         Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -155,6 +162,7 @@ class MagicTest {
         switch (raceName) {
             case "Elf" -> race = new Elf();
             case "Dwarf" -> race = new Dwarf();
+            case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
         Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
@@ -178,7 +186,29 @@ class MagicTest {
 
         powerBoostSpell.castSpell(caster, target);
         int expectedPowerBoost = target.getAttackPowerEffectModifier();
-        assertEquals(expectedPowerBoost, 20, "Players attack power är fel mängd");
+        assertEquals(20, expectedPowerBoost, "Players attack power är fel mängd");
     }
+    @ParameterizedTest(name = "PowerBoost mot {0} ska öka dens liv med {1}")
+    @CsvSource({
+            "Dwarf, 20",
+            "Elf, 5",
+            "Human, 10"
+    })
+    void powerBoostSpell_IncreasesAttackPowerDependingOnRace(String raceName, int expectedPowerBoost){
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Race race;
+        switch (raceName) {
+            case "Elf" -> race = new Elf();
+            case "Dwarf" -> race = new Dwarf();
+            case "Human" -> race = new Human();
+            default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
+        }
+        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        PowerBoostSpell powerBoostSpell = new PowerBoostSpell();
+        powerBoostSpell.castSpell(caster, target);
+        int actualPowerBoost = target.getAttackPowerEffectModifier();
+        assertEquals(target.getBaseAttackPower() + expectedPowerBoost, actualPowerBoost, "Din PowerBoost är för fel");
+    }
+
 }
 

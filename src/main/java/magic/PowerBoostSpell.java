@@ -18,7 +18,7 @@ public class PowerBoostSpell implements Magic {
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int attackPowerBoost = calculator.getCalculatedDamage();
+        int attackPowerBoost = calculator.getCalculatedModifier() + getBaseModifier();
         target.updateAttackPowerEffectModifier(attackPowerBoost);
     }
     public void accept(SpellVisitor visitor, Player caster, Player target){

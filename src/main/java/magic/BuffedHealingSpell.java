@@ -16,7 +16,7 @@ public class BuffedHealingSpell extends SpellDecorator{
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int healingAmount = calculator.getCalculatedDamage();
+        int healingAmount = calculator.getCalculatedModifier();
         target.updateCurrentLife(healingAmount);
         target.updateMaxLife(healingAmount);
     }

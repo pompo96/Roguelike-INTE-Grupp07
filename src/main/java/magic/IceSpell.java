@@ -1,8 +1,6 @@
 package magic;
 
 import player.Player;
-import race.Elf;
-import race.Dwarf;
 
 public class IceSpell implements Magic {
     private int numberOfUses = 2;
@@ -26,7 +24,7 @@ public class IceSpell implements Magic {
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int damageTaken = calculator.getCalculatedDamage();
+        int damageTaken = calculator.getCalculatedModifier();
         target.updateCurrentLife(-damageTaken);
     }
 

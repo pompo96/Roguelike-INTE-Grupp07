@@ -3,37 +3,46 @@ package magic;
 import player.Player;
 import race.Dwarf;
 import race.Elf;
+import race.Human;
 
 public class DamageCalculator implements SpellVisitor {
-    int calculatedDamage;
+    int calculatedModifier;
 
     public void visit(IceSpell iceSpell, Player caster, Player target) {
         int damage = iceSpell.getBaseModifier();
         if (target.getRace() instanceof Dwarf) {
-            calculatedDamage = damage + 10;
-
+            calculatedModifier = damage + 10;
         }
         if (target.getRace() instanceof Elf) {
-            calculatedDamage = damage - 5;
+            calculatedModifier = damage - 5;
+        }
+        if(target.getRace() instanceof Human){
+            calculatedModifier = damage;
         }
     }
 
     public void visit(FireSpell fireSpell, Player caster, Player target) {
         int damage = fireSpell.getBaseModifier();
         if (target.getRace() instanceof Dwarf) {
-            calculatedDamage = damage - 5;
+            calculatedModifier = damage - 5;
         }
         if (target.getRace() instanceof Elf) {
-            calculatedDamage = damage + 10;
+            calculatedModifier = damage + 10;
+        }
+        if(target.getRace() instanceof Human){
+            calculatedModifier = damage;
         }
     }
     public void visit(ElectricSpell electricSpell, Player caster, Player target) {
         int damage = electricSpell.getBaseModifier();
         if (target.getRace() instanceof Dwarf) {
-            calculatedDamage = damage - 5;
+            calculatedModifier = damage - 5;
         }
         if (target.getRace() instanceof Elf) {
-            calculatedDamage = damage - 5;
+            calculatedModifier = damage - 5;
+        }
+        if(target.getRace() instanceof Human){
+            calculatedModifier = damage;
         }
     }
     public void visit(HealingSpell healingSpell, Player caster, Player target){
@@ -44,14 +53,25 @@ public class DamageCalculator implements SpellVisitor {
         if(target.getRace() instanceof Elf){
             healingPower += 10;
         }
-        calculatedDamage = healingPower;
+        if(target.getRace() instanceof Human){
+            calculatedModifier = healingPower;
+        }
+        calculatedModifier = healingPower;
     }
     public void visit(PowerBoostSpell powerBoostSpell, Player caster, Player target){
         int attackPower = powerBoostSpell.getBaseModifier();
-        calculatedDamage = target.getBaseAttackPower() + attackPower;
+        if(target.getRace() instanceof Dwarf){
+            calculatedModifier = attackPower + 10;
+        }
+        if(target.getRace() instanceof Elf){
+            calculatedModifier = attackPower - 5;
+        }
+        if(target.getRace() instanceof Human){
+            calculatedModifier = attackPower;
+        }
     }
 
-    public int getCalculatedDamage() {
-        return calculatedDamage;
+    public int getCalculatedModifier() {
+        return calculatedModifier;
     }
 }

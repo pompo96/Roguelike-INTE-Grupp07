@@ -1,8 +1,5 @@
 package magic;
 import player.Player;
-import race.Dwarf;
-import race.Elf;
-import spell.Spell;
 
 public class FireSpell implements Magic {
     private int numberOfUses = 3;
@@ -26,7 +23,7 @@ public class FireSpell implements Magic {
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int damageTaken = calculator.getCalculatedDamage();
+        int damageTaken = calculator.getCalculatedModifier();
         target.updateCurrentLife(-damageTaken);
     }
     @Override

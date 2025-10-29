@@ -8,5 +8,5 @@ public interface SpellVisitor {
     void visit(HealingSpell healingSpell, Player caster, Player target);
     void visit(ElectricSpell electricSpell, Player caster, Player target);
     void visit(PowerBoostSpell powerBoostSpell, Player caster, Player target);
-    int getCalculatedDamage();
+    int getCalculatedModifier();
 }

@@ -23,7 +23,7 @@ public class HealingSpell implements Magic{
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int healthIncreased = calculator.getCalculatedDamage();
+        int healthIncreased = calculator.getCalculatedModifier();
         target.updateCurrentLife(healthIncreased);
     }
     @Override

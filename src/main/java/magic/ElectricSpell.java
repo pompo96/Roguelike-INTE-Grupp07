@@ -24,7 +24,7 @@ public class ElectricSpell implements Magic{
         accept(calculator, caster, target);
         numberOfUses--;
 
-        int damageTaken = calculator.getCalculatedDamage();
+        int damageTaken = calculator.getCalculatedModifier();
         target.updateCurrentLife(-damageTaken);
     }
     @Override
