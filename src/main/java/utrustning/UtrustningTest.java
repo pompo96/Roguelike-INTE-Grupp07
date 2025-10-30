@@ -75,6 +75,7 @@ public class UtrustningTest {
         inventory.put(shoes.getID(), shoes);
 
         assertEquals(3, shoes.getID());
+        //push
 
     }
 
