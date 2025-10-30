@@ -37,7 +37,6 @@ public class MapTest {
             colLength++;
             for (Tile tile : row) {
                 gridSize++;
-                tile.notify(); //Tile being unused got warnings...
             }
         }
         rowLength = gridSize / colLength;
