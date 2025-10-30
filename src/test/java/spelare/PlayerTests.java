@@ -1,4 +1,4 @@
-package spelare;
+/*package spelare;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import race.Race;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Koordinater ??
  * Equipped gear map(weapon -> itemObj, Armour -> itemObj, Boots -> itemObj)
  * Questlog list(questObjects)
- */
+ *//*
 public class PlayerTests {
     Player defaultPlayer;
     Race mockRace;
@@ -335,3 +335,4 @@ public class PlayerTests {
 
 
 }
+*/

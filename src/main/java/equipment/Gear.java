@@ -24,27 +24,27 @@ public class Gear extends Item{
         this.customValue = customValue;
     }
 
+    @Override
     public int getLifeModifier() { return type.equals("armour") ? customValue : 0; }
+    @Override
     public int getMovementModifier() { return type.equals("shoes") ? customValue : 0; }
+    @Override
     public int getWeaponDamage() { return type.equals("weapon") ? customValue : 0; }
 
     @Override
     public int getItemID() {
-        return 0;
+        return id;
     }
 
     public boolean getValue() {
         return itemExists;
     }
 
-    public int getItemId() {
-        return id;
-    }
-
     public String getRealName() {
         return name;
     }
 
+    @Override
     public String getName() {
         return type;
     }

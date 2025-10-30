@@ -235,10 +235,11 @@ public void openQuestLog() {
         return this.questItems.containsKey(itemName) && this.questItems.get(itemName) != null;
     }
 
-    public Player(Race race) {
+    /*public Player(Race race) {
         this(race, emptyItemList());
-    }
+    }*/
 
+    /*
     public Player(Race race, Map<String, Item> defaultItems) {
         this.race = race;
         this.maxLife = DEFAULT_LIFE + race.getLifeModifier();
@@ -249,7 +250,7 @@ public void openQuestLog() {
         items = new HashMap<>();
         items.putAll(defaultItems);
         questProgress = new HashMap<>();
-    }
+    }*/
 
     /*private static Map<String, Item> emptyItemList() {
         Map<String, Item> emptyItemMap = new HashMap<>();
