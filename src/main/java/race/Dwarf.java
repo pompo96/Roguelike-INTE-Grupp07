@@ -1,6 +1,6 @@
 package race;
 
-public class Human implements Race{
+public class Dwarf implements Race{
     public String getName(){
         return "Mr x";
     }

@@ -1,6 +1,7 @@
 package race;
 
-public class Human implements Race{
+public class Elf implements Race{
+    @Override
     public String getName(){
         return "Mr x";
     }
@@ -17,4 +18,5 @@ public class Human implements Race{
     public int getAttackPowerModifier(){
         return 0;
     }
+
 }
