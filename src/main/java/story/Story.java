@@ -1,6 +1,6 @@
 package story;
 
-import spelare.Player;
+import player.Player;
 import java.util.ArrayList;
 import java.util.List;
 

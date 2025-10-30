@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import race.Race;
-import spelare.Player;
+import player.Player;
+import equipment.Item;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,7 +34,11 @@ public class StoryTests {
         when(mockRace.getMovementModifier()).thenReturn(2);
         when(mockRace.getAttackPowerModifier()).thenReturn(5);
 
-        player = new Player(mockRace);
+        Map<String, Item> emptyInventory = new HashMap<>();
+        char symbol = 'P';
+        String name = "TestPlayer";
+
+        player = new Player(mockRace, emptyInventory, symbol, name);
 
         questDungeonBeat = new Story.DungeonQuest("DungeonBeat", "Beat the Dungeon", "Clear dungeon and defeat boss", 3);
         questLostAndFound = new Story.LostAndFoundQuest("LostAndFound", "Find the Lost Artifact", "Search for artifact", "DoransRing");
