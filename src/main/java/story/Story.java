@@ -6,13 +6,6 @@ import java.util.List;
 
 public class Story {
 
-    public enum QuestState {
-        NOT_STARTED,
-        ACTIVE,
-        COMPLETED,
-        FAILED
-    }
-
     public static class FightLog {
         private List<String> logEntries;
 
@@ -41,14 +34,18 @@ public class Story {
         protected String id;
         protected String name;
         protected String description;
-        protected QuestState state;
+        protected boolean isActive;
+        protected boolean isCompleted;
+        protected boolean isFailed;
         protected FightLog fightLog;
 
         protected Quest(String id, String name, String description) {
             this.id = id;
             this.name = name;
             this.description = description;
-            this.state = QuestState.NOT_STARTED;
+            this.isActive = false;
+            this.isCompleted = false;
+            this.isFailed = false;
             this.fightLog = new FightLog();
         }
 
@@ -67,8 +64,16 @@ public class Story {
             return this.description;
         }
 
-        public QuestState getState() {
-            return this.state;
+        public boolean isActive() {
+            return this.isActive;
+        }
+
+        public boolean isCompleted() {
+            return this.isCompleted;
+        }
+
+        public boolean isFailed() {
+            return this.isFailed;
         }
 
         public FightLog getFightLog() {
@@ -76,20 +81,22 @@ public class Story {
         }
 
         public void startQuest() {
-            if (this.state == QuestState.NOT_STARTED) {
-                this.state = QuestState.ACTIVE;
+            if (!isActive && !isCompleted && !isFailed) {
+                this.isActive = true;
             }
         }
 
         public void completeQuest() {
-            if (this.state == QuestState.ACTIVE) {
-                this.state = QuestState.COMPLETED;
+            if (isActive) {
+                this.isActive = false;
+                this.isCompleted = true;
             }
         }
 
         public void failQuest() {
-            if (this.state == QuestState.ACTIVE) {
-                this.state = QuestState.FAILED;
+            if (isActive) {
+                this.isActive = false;
+                this.isFailed = true;
             }
         }
     }
@@ -109,7 +116,7 @@ public class Story {
         }
 
         public boolean unlockDungeonDoor(DungeonDoor door, boolean correctKeyhole) {
-            if (this.state == QuestState.ACTIVE && !doorUnlocked) {
+            if (isActive && !doorUnlocked) {
                 if (correctKeyhole) {
                     door.unlock();
                     this.doorUnlocked = true;
@@ -121,8 +128,9 @@ public class Story {
             }
             return false;
         }
+
         public void fightEnemy(Enemy enemy, Player player) {
-            if (this.state != QuestState.ACTIVE || !doorUnlocked) {
+            if (!isActive || !doorUnlocked) {
                 return;
             }
 
@@ -141,14 +149,11 @@ public class Story {
         }
 
         public boolean startBossFight() {
-            if (this.state == QuestState.ACTIVE && areAllEnemiesDead()) {
-                return true;
-            }
-            return false;
+            return isActive && areAllEnemiesDead();
         }
 
         public boolean fightBoss(Boss boss, Player player) {
-            if (this.state != QuestState.ACTIVE || !areAllEnemiesDead()) {
+            if (!isActive || !areAllEnemiesDead()) {
                 return false;
             }
 
@@ -166,21 +171,21 @@ public class Story {
         }
 
         public void playerDiesFromEnemy(Player player) {
-            if (this.state == QuestState.ACTIVE) {
+            if (isActive) {
                 player.updateCurrentLife(-player.getCurrentLife());
                 this.onPlayerDeath();
             }
         }
 
         public void playerDiesFromBoss(Player player) {
-            if (this.state == QuestState.ACTIVE) {
+            if (isActive) {
                 player.updateCurrentLife(-player.getCurrentLife());
                 this.onPlayerDeath();
             }
         }
 
         public void onPlayerDeath() {
-            if (this.state == QuestState.ACTIVE) {
+            if (isActive) {
                 this.enemiesKilled = 0;
                 this.doorUnlocked = false;
                 this.bossDefeated = false;
@@ -224,7 +229,7 @@ public class Story {
         }
 
         public void enemyAttacksPlayer(Enemy enemy, Player player) {
-            if (this.state != QuestState.ACTIVE) {
+            if (!isActive) {
                 return;
             }
 
@@ -244,7 +249,7 @@ public class Story {
         }
 
         public void playerKillsEnemy(Enemy enemy) {
-            if (this.state != QuestState.ACTIVE) {
+            if (!isActive) {
                 return;
             }
 
@@ -292,7 +297,7 @@ public class Story {
         }
 
         public boolean completeWithItem(Player player) {
-            if (this.state == QuestState.ACTIVE && player.hasItem(requiredItemName)) {
+            if (isActive && player.hasItem(requiredItemName)) {
                 this.completeQuest();
                 player.questWasCompleted(this.id);
                 return true;
@@ -329,7 +334,6 @@ public class Story {
             this.itemName = itemName;
             this.itemDescription = itemDescription;
         }
-
     }
 
     public static class NPC {
@@ -349,7 +353,7 @@ public class Story {
         }
 
         public void rewardPlayer(Player player, int lifeBonus) {
-            if (this.quest.getState() == QuestState.COMPLETED) {
+            if (this.quest.isCompleted()) {
                 player.updateMaxLife(lifeBonus);
             }
         }

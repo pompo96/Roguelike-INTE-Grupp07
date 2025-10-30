@@ -47,14 +47,14 @@ public class StoryTests {
     }
 
     @Test
-    public void quest_startsInNotStartedState() {
-        assertEquals(Story.QuestState.NOT_STARTED, questDungeonBeat.getState());
+    public void quest_isNotActiveByDefault() {
+        assertFalse(questDungeonBeat.isActive());
     }
 
     @Test
     public void quest_canBeStarted() {
         questDungeonBeat.startQuest();
-        assertEquals(Story.QuestState.ACTIVE, questDungeonBeat.getState());
+        assertTrue(questDungeonBeat.isActive());
     }
 
     @Test
@@ -169,7 +169,7 @@ public class StoryTests {
         questDungeonBeat.fightBoss(mockBoss, player);
 
         verify(mockBoss, times(1)).takeDamage(200);
-        assertEquals(Story.QuestState.COMPLETED, questDungeonBeat.getState());
+        assertTrue(questDungeonBeat.isCompleted());
     }
 
     @Test
@@ -246,7 +246,7 @@ public class StoryTests {
         questTimedForest.enemyAttacksPlayer(enemy3, player);
         questTimedForest.playerKillsEnemy(enemy3);
 
-        assertEquals(Story.QuestState.COMPLETED, questTimedForest.getState());
+        assertTrue(questTimedForest.isCompleted());
         assertEquals(3, questTimedForest.getEnemiesKilled());
         assertEquals(30, questTimedForest.getHpLost());
 
@@ -269,7 +269,7 @@ public class StoryTests {
         questTimedForest.startQuest();
         questTimedForest.enemyAttacksPlayer(strongEnemy, player);
 
-        assertEquals(Story.QuestState.FAILED, questTimedForest.getState());
+        assertTrue(questTimedForest.isFailed());
         assertEquals(50, questTimedForest.getHpLost());
     }
 
@@ -291,17 +291,17 @@ public class StoryTests {
         questTimedForest.simulateTimeElapsed(61000);
         questTimedForest.enemyAttacksPlayer(enemy, player);
 
-        assertEquals(Story.QuestState.FAILED, questTimedForest.getState());
+        assertTrue(questTimedForest.isFailed());
         assertTrue(questTimedForest.isTimeExpired());
     }
 
-    @ParameterizedTest(name = "Damage={0} → HP Loss={1} → Expected={2}")
+    @ParameterizedTest(name = "Damage={0} → HP Loss={1} → Expected Completed={2}")
     @CsvSource({
-            "10, 30, COMPLETED",
-            "15, 45, FAILED",
-            "20, 60, FAILED"
+            "10, 30, true",
+            "15, 45, false",
+            "20, 60, false"
     })
-    public void parameterizedTest_hpLossAffectsTimedQuestOutcome(int damagePerEnemy, int totalDamage, String expectedState) {
+    public void parameterizedTest_hpLossAffectsTimedQuestOutcome(int damagePerEnemy, int totalDamage, boolean shouldComplete) {
         questTimedForest = new Story.TimedQuest("ForestClear", "Clear Forest",
                 "Test quest", 3, 40, 60);
 
@@ -315,12 +315,16 @@ public class StoryTests {
 
         for (int i = 0; i < 3; i++) {
             questTimedForest.enemyAttacksPlayer(testEnemy, player);
-            if (questTimedForest.getState() == Story.QuestState.ACTIVE) {
+            if (questTimedForest.isActive()) {
                 questTimedForest.playerKillsEnemy(testEnemy);
             }
         }
 
-        assertEquals(Story.QuestState.valueOf(expectedState), questTimedForest.getState());
+        if (shouldComplete) {
+            assertTrue(questTimedForest.isCompleted());
+        } else {
+            assertTrue(questTimedForest.isFailed());
+        }
     }
 
     @Test
@@ -329,7 +333,7 @@ public class StoryTests {
         questLostAndFound.startQuest();
 
         assertTrue(questLostAndFound.completeWithItem(player));
-        assertEquals(Story.QuestState.COMPLETED, questLostAndFound.getState());
+        assertTrue(questLostAndFound.isCompleted());
     }
 
     @Test
@@ -337,7 +341,7 @@ public class StoryTests {
         questLostAndFound.startQuest();
 
         assertFalse(questLostAndFound.completeWithItem(player));
-        assertNotEquals(Story.QuestState.COMPLETED, questLostAndFound.getState());
+        assertFalse(questLostAndFound.isCompleted());
     }
 
     @Test
@@ -345,7 +349,7 @@ public class StoryTests {
         npcXerxes.giveQuestToPlayer(player);
 
         assertEquals(1, player.getQuestCount());
-        assertEquals(Story.QuestState.ACTIVE, questDungeonBeat.getState());
+        assertTrue(questDungeonBeat.isActive());
     }
 
     @Test
