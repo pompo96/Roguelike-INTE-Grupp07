@@ -2,6 +2,9 @@ package utrustning;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UtrustningTest {
@@ -63,6 +66,16 @@ public class UtrustningTest {
         assertEquals("Sandals", shoes.getRealName());
         assertEquals(5, shoes.getMovementModifier());
         assertEquals("shoes", shoes.getName());
+    }
+
+    @Test
+    public void itemInInventory(){
+        Map<Integer, Item> inventory = new HashMap<>();
+        Utrustning shoes = new Utrustning("shoes", 3,"Sandals", 5);
+        inventory.put(shoes.getID(), shoes);
+
+        assertEquals(3, shoes.getID());
+
     }
 
 
