@@ -1,20 +1,27 @@
 package race;
 
-public class Human implements Race{
-    public String getName(){
-        return "Mr x";
+import magic.*;
+
+public class Human extends AbstractRace{
+
+    public Human(){
+        super(0,0,0,"Human");
     }
+
     @Override
-    public int getLifeModifier() {
+    public int getSpellModifier(Magic spell){
+        if (spell instanceof FireSpell){return 0;}
+        if (spell instanceof IceSpell){return 0;}
+        if (spell instanceof ElectricSpell){return 0;}
+        if (spell instanceof HealingSpell){return 5;}
+        if (spell instanceof PowerBoostSpell){return 0;}
         return 0;
     }
 
     @Override
-    public int getMovementModifier() {
-        return 0;
+    public boolean canCastSpell(Magic spell){
+        return true;
     }
-    @Override
-    public int getAttackPowerModifier(){
-        return 0;
-    }
+
+    //metod för vilken equipment human får/börjar med
 }
