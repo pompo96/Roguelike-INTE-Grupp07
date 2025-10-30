@@ -197,11 +197,6 @@ public class Ai {
         return distanceToMob <= mob.getAggroRadius();
     }
 
-    /*boolean playerOutOfCombatRadius(){
-        double distanceToPlayer = Math.sqrt( Math.pow(player.getX() - mob.getSpawnPoint().x, 2) +
-                Math.pow(player.getY() - mob.getSpawnPoint().y, 2) );
-        return distanceToPlayer > mob.getCombatRadius();}*/
-
     boolean playerOutOfCombatRadius(){
         double distanceToPlayer = calculateDistance(mob.getSpawnPoint(), new Position(player.getX(), player.getY()));
         return distanceToPlayer > mob.getCombatRadius();
