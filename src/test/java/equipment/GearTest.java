@@ -1,4 +1,4 @@
-package utrustning;
+package equipment;
 
 import org.junit.jupiter.api.Test;
 
@@ -7,42 +7,42 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UtrustningTest {
+public class GearTest {
 
 
     @Test
     public void weaponHadIDNameStatsAndTypeBasic(){
-        Utrustning sword = new Utrustning("weapon", 1, "Flamesword");
+        Gear sword = new Gear("weapon", 1, "Flamesword");
         assertTrue(sword.getValue());
-        assertEquals(1, sword.getID());
+        assertEquals(1, sword.getItemID());
         assertEquals("Flamesword", sword.getRealName());
-        assertEquals(0, sword.getDamageModifier());
+        assertEquals(0, sword.getWeaponDamage());
         assertEquals("weapon", sword.getName());
     }
     @Test
     public void weaponHadIDNameStatsAndType(){
-        Utrustning sword = new Utrustning("weapon", 1, "Flamesword", 55);
+        Gear sword = new Gear("weapon", 1, "Flamesword", 55);
         assertTrue(sword.getValue());
-        assertEquals(1, sword.getID());
+        assertEquals(1, sword.getItemID());
         assertEquals("Flamesword", sword.getRealName());
-        assertEquals(55, sword.getDamageModifier());
+        assertEquals(55, sword.getWeaponDamage());
         assertEquals("weapon", sword.getName());
     }
 
     @Test
     public void armorHadIDNameStatsAndTypeBasic(){
-        Utrustning armour = new Utrustning("armour", 2, "Chestplate");
+        Gear armour = new Gear("armour", 2, "Chestplate");
         assertTrue(armour.getValue());
-        assertEquals(2, armour.getID());
+        assertEquals(2, armour.getItemID());
         assertEquals("Chestplate", armour.getRealName());
         assertEquals(0, armour.getLifeModifier());
         assertEquals("armour", armour.getName());
     }
     @Test
     public void armorHadIDNameStatsAndType(){
-        Utrustning armour = new Utrustning("armour", 2, "Chestplate", 20);
+        Gear armour = new Gear("armour", 2, "Chestplate", 20);
         assertTrue(armour.getValue());
-        assertEquals(2, armour.getID());
+        assertEquals(2, armour.getItemID());
         assertEquals("Chestplate", armour.getRealName());
         assertEquals(20, armour.getLifeModifier());
         assertEquals("armour", armour.getName());
@@ -51,18 +51,18 @@ public class UtrustningTest {
 
     @Test
     public void shoesHadIDNameStatsAndTypeBasic(){
-        Utrustning shoes = new Utrustning("shoes", 3,"Sandals");
+        Gear shoes = new Gear("shoes", 3,"Sandals");
         assertTrue(shoes.getValue());
-        assertEquals(3, shoes.getID());
+        assertEquals(3, shoes.getItemID());
         assertEquals("Sandals", shoes.getRealName());
         assertEquals(0, shoes.getMovementModifier());
         assertEquals("shoes", shoes.getName());
     }
     @Test
     public void shoesHadIDNameStatsAndType(){
-        Utrustning shoes = new Utrustning("shoes", 3,"Sandals", 5);
+        Gear shoes = new Gear("shoes", 3,"Sandals", 5);
         assertTrue(shoes.getValue());
-        assertEquals(3, shoes.getID());
+        assertEquals(3, shoes.getItemID());
         assertEquals("Sandals", shoes.getRealName());
         assertEquals(5, shoes.getMovementModifier());
         assertEquals("shoes", shoes.getName());
@@ -71,10 +71,10 @@ public class UtrustningTest {
     @Test
     public void itemInInventory(){
         Map<Integer, Item> inventory = new HashMap<>();
-        Utrustning shoes = new Utrustning("shoes", 3,"Sandals", 5);
-        inventory.put(shoes.getID(), shoes);
+        Gear shoes = new Gear("shoes", 3,"Sandals", 5);
+        inventory.put(shoes.getItemID(), shoes);
 
-        assertEquals(3, shoes.getID());
+        assertEquals(3, shoes.getItemID());
         //push
 
     }

@@ -10,6 +10,6 @@ public abstract class Item extends GameObject {
     public abstract int getLifeModifier();
     public abstract int getMovementModifier();
     public abstract int getWeaponDamage();
-
+    public abstract int getItemID();
     public abstract String getName();
 }

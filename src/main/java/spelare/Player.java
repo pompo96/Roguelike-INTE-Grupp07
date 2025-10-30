@@ -2,7 +2,7 @@
 package spelare;
 
 import race.Race;
-import utrustning.Item;
+import equipment.Item;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -134,7 +134,7 @@ public class Player {
 
     public void equipWeapon(Item item) {
         items.put(item.getName(), item);
-        updateAttackPower(item.getDamageModifier());
+        updateAttackPower(item.getWeaponDamage());
     }
     public void equipChestpiece(Item item){
         items.put(item.getName(), item);
@@ -147,7 +147,7 @@ public class Player {
     }
 
     public void addToInventory(Item item) {
-        inventory.put(item.getID(), item);
+        inventory.put(item.getItemID(), item);
     }
 
     public int getInventorySize() {

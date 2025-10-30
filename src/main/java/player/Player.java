@@ -42,14 +42,6 @@ public class Player extends GameObject {
         engagedMobs = new HashSet<PlaceholderMob>();
     }
 
-    public int getX(){
-        return x;
-    }
-
-    public int getY(){
-        return y;
-    }
-
     private static Map<String, Item> emptyItemList() {
         Map<String, Item> emptyItemMap = new HashMap<>();
         emptyItemMap.put("weapon", null);

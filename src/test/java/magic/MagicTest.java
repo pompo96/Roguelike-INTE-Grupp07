@@ -17,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class MagicTest {
+
+
     @ParameterizedTest
     @MethodSource("spellProvider")
     void spells_ShouldNotCastMoreThanItsSpecifiedAmount(Magic spell) {
@@ -43,7 +45,7 @@ class MagicTest {
             "Human, 10"
     })
     void fireSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
 
         Race race;
         switch (raceName) {
@@ -52,7 +54,7 @@ class MagicTest {
             case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(race, new HashMap<String, Item>(), '@', "name");
         int healthBeforeSpellCast = target.getCurrentLife();
         FireSpell fireSpell = new FireSpell();
         fireSpell.castSpell(caster, target);
@@ -67,7 +69,7 @@ class MagicTest {
             "Human, 10"
     })
     void iceSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
 
         Race race;
         switch (raceName) {
@@ -76,7 +78,7 @@ class MagicTest {
             case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(race, new HashMap<String, Item>(), '@', "name");
         int healthBeforeSpellCast = target.getCurrentLife();
         IceSpell iceSpell = new IceSpell();
         iceSpell.castSpell(caster, target);
@@ -91,7 +93,7 @@ class MagicTest {
             "Human, 10"
     })
     void electricSpell_DealsDifferentDamageDependingOnRace(String raceName, int expectedDamage) {
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
         Race race;
         switch (raceName) {
             case "Elf" -> race = new Elf();
@@ -99,7 +101,7 @@ class MagicTest {
             case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(race, new HashMap<String, Item>(), '@', "name");
         int healthBeforeSpellCast = target.getCurrentLife();
         ElectricSpell electricSpell = new ElectricSpell();
         electricSpell.castSpell(caster, target);
@@ -109,8 +111,8 @@ class MagicTest {
     @Test
     void buffedElectricalSpell_DecreasesTargetSpeed() {
         BuffedElectricalSpell buffedElectricalSpell = new BuffedElectricalSpell(new ElectricSpell());
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
-        Player target = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
+        Player target = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
 
         buffedElectricalSpell.castSpell(caster, target);
         assertEquals(8, target.getMovementSpeed(), "Din movement speed är fel mängd");
@@ -133,7 +135,7 @@ class MagicTest {
             "Human, 10"
     })
     void healingSpell_HealsHealthPool(String raceName, int expectedHealthIncrease) {
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
         Race race;
         switch (raceName) {
             case "Elf" -> race = new Elf();
@@ -141,7 +143,7 @@ class MagicTest {
             case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(race, new HashMap<String, Item>(), '@', "name");
         int healthDecrease = -20;
         target.updateCurrentLife(healthDecrease);
         int currentTargetHealth = target.getCurrentLife();
@@ -157,7 +159,7 @@ class MagicTest {
             "Human, 10"
     })
     void buffedHealingSpell_HealsHealthPoolAndIncreasesMaxHealth(String raceName, int expectedHealthIncrease) {
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
         Race race;
         switch (raceName) {
             case "Elf" -> race = new Elf();
@@ -165,7 +167,7 @@ class MagicTest {
             case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(race, new HashMap<String, Item>(), '@', "name");
         int healthDecrease = -20;
         target.updateCurrentLife(healthDecrease);
         int currentTargetMaxHealth = target.getMaxLife();
@@ -181,8 +183,8 @@ class MagicTest {
     void defaultPowerBoostSpell_IncreasesAttackPower() {
         PowerBoostSpell powerBoostSpell = new PowerBoostSpell();
 
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
-        Player target = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
+        Player target = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
 
         powerBoostSpell.castSpell(caster, target);
         int expectedPowerBoost = target.getAttackPowerEffectModifier();
@@ -195,7 +197,7 @@ class MagicTest {
             "Human, 10"
     })
     void powerBoostSpell_IncreasesAttackPowerDependingOnRace(String raceName, int expectedPowerBoost){
-        Player caster = new Player(new Human(), new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
         Race race;
         switch (raceName) {
             case "Elf" -> race = new Elf();
@@ -203,7 +205,7 @@ class MagicTest {
             case "Human" -> race = new Human();
             default -> throw new IllegalArgumentException("Okänd ras: " + raceName);
         }
-        Player target = new Player(race, new HashMap<String, Item>(), 0, 0, 'x', "Mr x");
+        Player target = new Player(race, new HashMap<String, Item>(), '@', "name");
         PowerBoostSpell powerBoostSpell = new PowerBoostSpell();
         powerBoostSpell.castSpell(caster, target);
         int actualPowerBoost = target.getAttackPowerEffectModifier();

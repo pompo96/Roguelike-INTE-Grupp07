@@ -3,8 +3,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import race.Race;
 import story.Quest;
-import utrustning.Item;
-import utrustning.Utrustning;
+import equipment.Item;
+import equipment.Gear;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class PlayerTests {
         mockItemBoots = mock(Item.class);
 
         when(mockItemWeapon.getName()).thenReturn("weapon");
-        when(mockItemWeapon.getDamageModifier()).thenReturn(15);
+        when(mockItemWeapon.getWeaponDamage()).thenReturn(15);
 
         when(mockItemChestpiece.getName()).thenReturn("chestpiece");
         when(mockItemChestpiece.getLifeModifier()).thenReturn(10);
@@ -293,7 +293,7 @@ public class PlayerTests {
     @Test
     public void playerCanAddItemToInventory() {
         Player player = new Player(mockRace);
-        Item sword = new Utrustning("weapon", 1, "Sword", 15);
+        Item sword = new Gear("weapon", 1, "Sword", 15);
 
         player.addToInventory(sword);
 
@@ -305,7 +305,7 @@ public class PlayerTests {
     @Test
     public void equippingWeapon_updatesAttackPower(){
         defaultPlayer.equipItem(mockItemWeapon);
-        int updatedAttack = mockItemWeapon.getDamageModifier();
+        int updatedAttack = mockItemWeapon.getWeaponDamage();
 
         assertEquals(updatedAttack, defaultPlayer.getAttackPower());
     }

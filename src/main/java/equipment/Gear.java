@@ -1,6 +1,6 @@
-package utrustning;
+package equipment;
 
-public class Utrustning implements Item{
+public class Gear extends Item{
 
     private final boolean itemExists;
     private int id;
@@ -8,13 +8,15 @@ public class Utrustning implements Item{
     private String type; //"weapon", "armor", "shoes"
     private int customValue;
 
-    public Utrustning(String type, int id, String name){
+    public Gear(String type, int id, String name){
+        super(0,0, 'I');
         this.itemExists = true;
         this.type = type;
         this.id = id;
         this.name = name;
     }
-    public Utrustning(String type, int id, String name, int customValue){
+    public Gear(String type, int id, String name, int customValue){
+        super(0,0, 'I');
         this.itemExists = true;
         this.type = type;
         this.id = id;
@@ -24,13 +26,18 @@ public class Utrustning implements Item{
 
     public int getLifeModifier() { return type.equals("armour") ? customValue : 0; }
     public int getMovementModifier() { return type.equals("shoes") ? customValue : 0; }
-    public int getDamageModifier() { return type.equals("weapon") ? customValue : 0; }
+    public int getWeaponDamage() { return type.equals("weapon") ? customValue : 0; }
+
+    @Override
+    public int getItemID() {
+        return 0;
+    }
 
     public boolean getValue() {
         return itemExists;
     }
 
-    public int getID() {
+    public int getItemId() {
         return id;
     }
 
