@@ -1,6 +1,8 @@
 package race;
 
 import magic.Magic;
+//import utrustning.Item;
+//import java.util.List;
 
 public interface Race {
     int getLifeModifier();
@@ -10,5 +12,9 @@ public interface Race {
 
     int getSpellModifier(Magic spell);
     boolean canCastSpell(Magic spell);
+
+    //metoder för hur equipments används av olika raser
+    //List<Item> startingItems();
+    //boolean canUseEquipment(Item item);
 
 }

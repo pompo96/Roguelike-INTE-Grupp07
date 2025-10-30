@@ -95,7 +95,7 @@ public class RaceTests {
     @Test
     public void elfCanCastFireSpell(){
         Race elf = new Elf();
-        Magic iceSpell = new Icepell();
+        Magic iceSpell = new IceSpell();
         assertTrue(elf.canCastSpell(iceSpell));
     }
 
