@@ -1,0 +1,16 @@
+package map.generation;
+import map.DungeonMap;
+import map.tiles.TileFactory;
+
+public interface GenerationStrategy {
+    /**
+     * Generate a map using the provided factory and dimensions.
+     *
+     * @param factory the TileFactory used to build tiles
+     * @param width   map width (columns)
+     * @param height  map height (rows)
+     * @return a height x width Tile[][] map
+     */
+    DungeonMap generate(TileFactory factory, int height, int width);
+
+}

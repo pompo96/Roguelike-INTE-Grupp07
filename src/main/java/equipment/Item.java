@@ -1,12 +1,15 @@
 package equipment;
 
-public interface Item {
-    int getLifeModifier();
+import gameObject.GameObject;
 
-    int getMovementModifier();
-    int getWeaponDamage();
+public abstract class Item extends GameObject {
+    public Item(int y, int x, char symbol) {
+        super(y, x, symbol);
+    }
 
-    String getName();
+    public abstract int getLifeModifier();
+    public abstract int getMovementModifier();
+    public abstract int getWeaponDamage();
 
-
+    public abstract String getName();
 }
