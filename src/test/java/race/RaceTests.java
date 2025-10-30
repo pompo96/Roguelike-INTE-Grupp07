@@ -95,15 +95,15 @@ public class RaceTests {
     @Test
     public void elfCanCastFireSpell(){
         Race elf = new Elf();
-        Magic iceSpell = new IceSpell();
-        assertTrue(elf.canCastSpell(iceSpell));
+        Magic fireSpell = new FireSpell();
+        assertTrue(elf.canCastSpell(fireSpell));
     }
 
     @Test
     public void dwarfCanCastIceSpell(){
         Race dwarf = new Dwarf();
-        Magic fireSpell = new FireSpell();
-        assertTrue(dwarf.canCastSpell(fireSpell));
+        Magic iceSpell = new IceSpell();
+        assertTrue(dwarf.canCastSpell(iceSpell));
     }
 
     @Test
