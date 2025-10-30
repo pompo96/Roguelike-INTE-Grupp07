@@ -4,6 +4,11 @@ import ai.PlaceholderMob;
 import gameObject.GameObject;
 import race.Race;
 import equipment.Item;
+import race.Race;
+import equipment.Item;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.*;
 
@@ -24,6 +29,11 @@ public class Player extends GameObject {
     private Map<String, Object> questItems;
     private HashSet<PlaceholderMob> engagedMobs;
 
+    private int attackPower;
+    private double attackPowerModifier;
+    private Map<Integer, Item> inventory = new HashMap<>();
+
+
 
     public Player(Race race, Map<String, Item> defaultItems, char symbol, String name) {
         super(0,0, symbol);
@@ -40,6 +50,9 @@ public class Player extends GameObject {
         this.questLogOpen = false;
         this.questItems = new HashMap<>();
         engagedMobs = new HashSet<PlaceholderMob>();
+
+
+        this.attackPowerModifier = 1;
     }
 
     private static Map<String, Item> emptyItemList() {
@@ -109,9 +122,9 @@ public class Player extends GameObject {
 
     }
 
-    public void equipWeapon(Item item) {
+    /*public void equipWeapon(Item item) {
         items.put(item.getName(), item);
-        //updateAttackPower(item.getDamageModifier());
+        updateAttackPower(item.getDamageModifier());
     }
     public void equipChestpiece(Item item){
         items.put(item.getName(), item);
@@ -121,7 +134,7 @@ public class Player extends GameObject {
     public void equipBoots(Item item){
         items.put(item.getName(), item);
         updateMovementSpeed(item.getMovementModifier());
-    }
+    }*/
 
     public int getMovementSpeed() {
         return this.movementSpeed;
@@ -221,6 +234,127 @@ public void openQuestLog() {
     public boolean hasItem(String itemName) {
         return this.questItems.containsKey(itemName) && this.questItems.get(itemName) != null;
     }
+
+    public Player(Race race) {
+        this(race, emptyItemList());
+    }
+
+    public Player(Race race, Map<String, Item> defaultItems) {
+        this.race = race;
+        this.maxLife = DEFAULT_LIFE + race.getLifeModifier();
+        this.currentLife = this.maxLife;
+        this.movementSpeed = DEFAULT_MOVEMENT_SPEED + race.getMovementModifier();
+        this.attackPower = DEFAULT_ATTACK_POWER + race.getAttackPowerModifier();
+        this.attackPowerModifier = 1;
+        items = new HashMap<>();
+        items.putAll(defaultItems);
+        questProgress = new HashMap<>();
+    }
+
+    /*private static Map<String, Item> emptyItemList() {
+        Map<String, Item> emptyItemMap = new HashMap<>();
+        emptyItemMap.put("weapon", null);
+        emptyItemMap.put("chestpiece", null);
+        emptyItemMap.put("boots", null);
+        return emptyItemMap;
+    }*/
+
+    public void setQuest(Map<String, Boolean> questProgress){
+        this.questProgress = questProgress;
+    }
+
+    /*public void questWasCompleted(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            System.out.println("This questID was either an empty string or null");
+            return; //Maybe return an exception instead? These checks are for the developers (us) only. Now gotta make some tests for the null values and mocking.
+        }
+        questProgress.put(questID, true);
+        System.out.println(questProgress);
+    }*/
+    public void questWasStarted(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            System.out.println("This questID was either an empty string or null");
+            return;
+        }
+        questProgress.put(questID, false);
+    }
+    /*public boolean isQuestStarted(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            return false;
+        }
+        System.out.println(questProgress);
+        return questProgress.containsKey(questID);
+    }*/
+    /*public boolean isQuestComplete(String questID){
+        if (questID == null || questID.trim().isEmpty()){
+            System.out.println("This questID was either an empty string or null");
+            return false;
+        }
+        System.out.println(questProgress);
+        return questProgress.getOrDefault(questID, false);
+
+    }*/
+
+
+    /*public void equipItem(Item item) {
+        if(!items.containsKey(item.getName())){
+            return;
+        }
+        switch(item.getName()){
+            case "weapon":
+                equipWeapon(item);
+                break;
+            case "chestpiece":
+                equipChestpiece(item);
+                break;
+            case "boots":
+                equipBoots(item);
+                break;
+            default:
+                break;
+        }
+
+
+    }*/
+
+    public void equipWeapon(Item item) {
+        items.put(item.getName(), item);
+        updateAttackPower(item.getWeaponDamage());
+    }
+    public void equipChestpiece(Item item){
+        items.put(item.getName(), item);
+        updateMaxLife(item.getLifeModifier());
+    }
+
+    public void equipBoots(Item item){
+        items.put(item.getName(), item);
+        updateMovementSpeed(item.getMovementModifier());
+    }
+
+    public void addToInventory(Item item) {
+        inventory.put(item.getItemID(), item);
+    }
+
+    public int getInventorySize() {
+        return inventory.size();
+    }
+
+    public Item getItemFromInventory(int id) {
+        return inventory.get(id);
+    }
+
+
+    public int getAttackPower() {
+        return (int) (attackPower*attackPowerModifier);
+    }
+
+    public void updateAttackPower(int weaponAttackPower) {
+        this.attackPower = weaponAttackPower;
+    }
+    public void updateAttackPowerModifier(double damageMultiplier) {
+        this.attackPowerModifier  *= damageMultiplier;
+    }
+
 }
 
 

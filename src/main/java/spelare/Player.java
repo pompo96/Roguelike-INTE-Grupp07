@@ -1,4 +1,4 @@
-//Double check if the hashmap for quest was done right
+/*//Double check if the hashmap for quest was done right
 package spelare;
 
 import race.Race;
@@ -178,3 +178,4 @@ public class Player {
         this.attackPowerModifier  *= damageMultiplier;
     }
 }
+*/
