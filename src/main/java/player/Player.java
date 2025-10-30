@@ -1,14 +1,11 @@
 package player;
 
+import ai.PlaceholderMob;
 import gameObject.GameObject;
 import race.Race;
 import equipment.Item;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Player extends GameObject {
     private int maxLife;
@@ -25,6 +22,7 @@ public class Player extends GameObject {
     private List<Quest> activeQuests;
     private boolean questLogOpen;
     private Map<String, Object> questItems;
+    private HashSet<PlaceholderMob> engagedMobs;
 
 
     public Player(Race race, Map<String, Item> defaultItems, char symbol, String name) {
@@ -41,6 +39,15 @@ public class Player extends GameObject {
         this.activeQuests = new ArrayList<>();
         this.questLogOpen = false;
         this.questItems = new HashMap<>();
+        engagedMobs = new HashSet<PlaceholderMob>();
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
     }
 
     private static Map<String, Item> emptyItemList() {
@@ -156,6 +163,17 @@ public class Player extends GameObject {
 //        return items.get("weapon").getWeaponDamage() + finalAttackPower;
 //    }
 
+    public void engageMob(PlaceholderMob mob){
+        engagedMobs.add(mob);
+    }
+
+    public void disengageMob(PlaceholderMob mob){
+        engagedMobs.remove(mob);
+    }
+
+    public Set<PlaceholderMob> getEngagedMobs(){
+        return Collections.unmodifiableSet(engagedMobs);
+    }
 
 public void openQuestLog() {
     this.questLogOpen = true;
