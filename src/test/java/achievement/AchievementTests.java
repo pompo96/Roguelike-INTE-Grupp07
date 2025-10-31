@@ -63,6 +63,11 @@ public class AchievementTests {
     }
 
     @Test
+    public void totalPointsStartsWithZero(){
+        assertEquals(0, manager.getTotalPoints());
+    }
+
+    @Test
     public void unlockingMultipleAchievementsAddsPointsCorrect(){
         FireSpell fireSpell = new FireSpell();
         HealingSpell healingSpell = new HealingSpell();
@@ -78,6 +83,7 @@ public class AchievementTests {
     @Test
     public void completingSameAchievementsTwiceDoesNotAddPoints(){
         FireSpell fireSpell = new FireSpell();
+        manager.onSpellCast(fireSpell);
         manager.onSpellCast(fireSpell);
 
         assertTrue(manager.isUnlocked("first_fire_spell"));
@@ -96,5 +102,10 @@ public class AchievementTests {
             assertFalse(tempManager.isUnlocked("first_healing_spell"));
             assertEquals(0, tempManager.getTotalPoints());
         }
+    }
+
+    @Test
+    public void getAchievementWithInvalidIdShouldReturnNull(){
+        assertNull(manager.getAchievement("invalid_id"));
     }
 }
