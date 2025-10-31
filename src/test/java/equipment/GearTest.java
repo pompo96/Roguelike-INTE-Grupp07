@@ -1,6 +1,7 @@
 package equipment;
 
 import org.junit.jupiter.api.Test;
+import player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +9,30 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GearTest {
+
+    private Shop shopStock = new Shop();;
+    private Gear sword;
+
+
+
+    @Test
+    public void shopStockExists(){
+        assertNotNull(shopStock);
+    }
+
+
+    @Test
+    public void shopCanAddItemsToStock() {
+        sword = new Gear("weapon", 1, "Flamesword", 55);
+        Gear armour = new Gear("armour", 2, "Cocochest");
+        shopStock.addItem(sword, 100);
+        shopStock.addItem(armour, 100);
+
+        assertTrue(shopStock.hasItem(1));
+        assertTrue(shopStock.hasItem(2));
+        assertEquals(2, shopStock.getStockSize());
+    }
+
 
 
     @Test
