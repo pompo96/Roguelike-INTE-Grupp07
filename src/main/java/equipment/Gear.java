@@ -53,6 +53,4 @@ public class Gear extends Item{
         return customValue;
     }
 
-
-
 }

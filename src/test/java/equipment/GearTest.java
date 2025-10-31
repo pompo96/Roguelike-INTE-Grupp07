@@ -1,5 +1,8 @@
 package equipment;
 
+import static org.mockito.Mockito.*;
+
+
 import org.junit.jupiter.api.Test;
 import player.Player;
 
@@ -20,6 +23,11 @@ public class GearTest {
         assertNotNull(shopStock);
     }
 
+    @Test
+    public void shopReturnsZeroForMissingItemPrice() {
+        assertEquals(0, shopStock.getItemPrice(999));
+    }
+
 
     @Test
     public void shopCanAddItemsToStock() {
@@ -31,6 +39,40 @@ public class GearTest {
         assertTrue(shopStock.hasItem(1));
         assertTrue(shopStock.hasItem(2));
         assertEquals(2, shopStock.getStockSize());
+    }
+
+    @Test
+    public void shopReturnsCorrectPriceForExistingItem() {
+        Gear sword = new Gear("weapon", 1, "Flamesword", 55);
+        shopStock.addItem(sword, 150);
+        assertEquals(150, shopStock.getItemPrice(1));
+    }
+
+
+    @Test
+    public void purchaseItemRemovesFromShopAndAddsToPlayerInventory() {
+        Player mockPlayer = mock(Player.class);
+
+        Gear sword = new Gear("weapon", 1, "Iron Sword", 15);
+        shopStock.addItem(sword, 100);
+
+        boolean purchased = shopStock.purchaseItem(1, mockPlayer);
+
+        assertTrue(purchased);
+        assertEquals(0, shopStock.getStockSize());
+        assertFalse(shopStock.hasItem(1));
+
+        verify(mockPlayer).addToInventory(sword);
+    }
+
+    @Test
+    public void purchaseNonExistentItemReturnsFalse() {
+        Player mockPlayer = mock(Player.class);
+
+        boolean result = shopStock.purchaseItem(999, mockPlayer);
+
+        assertFalse(result);
+        verify(mockPlayer, never()).addToInventory(any());
     }
 
 
@@ -93,6 +135,8 @@ public class GearTest {
         assertEquals("shoes", shoes.getName());
     }
 
+
+
     @Test
     public void itemInInventory(){
         Map<Integer, Item> inventory = new HashMap<>();
@@ -100,8 +144,12 @@ public class GearTest {
         inventory.put(shoes.getItemID(), shoes);
 
         assertEquals(3, shoes.getItemID());
-        //push
+    }
 
+    @Test
+    public void getCustomValue(){
+        Gear shoes = new Gear("shoes", 3,"Sandals", 5);
+        assertEquals(5, shoes.getCustomValue());
     }
 
 
