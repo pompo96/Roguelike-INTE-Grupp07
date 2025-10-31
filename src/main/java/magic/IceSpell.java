@@ -27,16 +27,6 @@ public class IceSpell implements Magic {
         int damageTaken = calculator.getCalculatedModifier();
         target.updateCurrentLife(-damageTaken);
     }
-
-    @Override
-    public boolean checkIfAbleToCast() {
-        return true;
-    }
-
-    @Override
-    public int checkEnvironmentBoost() {
-        return 1;
-    }
     @Override
     public void accept(SpellVisitor visitor, Player caster, Player target){
         visitor.visit(this, caster, target);

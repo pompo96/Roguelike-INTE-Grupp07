@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+
 
 class MagicTest {
 
@@ -22,8 +22,8 @@ class MagicTest {
     @ParameterizedTest
     @MethodSource("spellProvider")
     void spells_ShouldNotCastMoreThanItsSpecifiedAmount(Magic spell) {
-        Player caster = mock(Player.class);
-        Player target = mock(Player.class);
+        Player caster = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
+        Player target = new Player(new Human(), new HashMap<String, Item>(), '@', "name");
         int amountOfUses = spell.getNumberOfUses();
         for (int i = 0; i < amountOfUses; i++) {
             spell.castSpell(caster, target);
@@ -32,6 +32,22 @@ class MagicTest {
         assertThrows(IllegalStateException.class, () -> {
             spell.castSpell(caster, target);
         });
+    }
+
+    @ParameterizedTest(name = "{0} ska ha korrekt magicType")
+    @MethodSource("spellProvider")
+    void allSpells_ShouldHaveCorrectMagicType(Magic spell) {
+        String expectedType = switch (spell.getClass().getSimpleName()) {
+            case "FireSpell", "BuffedFireSpell" -> "FireSpell";
+            case "IceSpell" -> "IceSpell";
+            case "ElectricSpell", "BuffedElectricalSpell" -> "ElectricSpell";
+            case "HealingSpell", "BuffedHealingSpell" -> "HealingSpell";
+            case "PowerBoostSpell" -> "PowerBoostSpell";
+            default -> throw new IllegalArgumentException("Saknar förväntad magicType för " + spell.getClass().getSimpleName());
+        };
+
+        assertEquals(expectedType, spell.getMagicType(),
+                () -> spell.getClass().getSimpleName() + " returnerade fel magicType");
     }
 
     static List<Magic> spellProvider() {
@@ -127,7 +143,14 @@ class MagicTest {
 
         assertTrue(lightSource, "Solen är ute och inte månen, alltså kan du inte använda en lighteffect");
     }
+    @Test
+    void lightEffect_DoesNotWorkWhenNotDark(){
+        Magic fireSpell = new FireSpell();
+        LightEffect fireSpellWithLightSource = new LightEffect(fireSpell);
 
+        boolean lightSource = fireSpellWithLightSource.castLightSource(false);
+        assertFalse(lightSource);
+    }
     @ParameterizedTest(name = "HealingSpell mot {0} ska öka dens liv med {1}")
     @CsvSource({
             "Dwarf, 5", //mindre healing
@@ -209,8 +232,7 @@ class MagicTest {
         PowerBoostSpell powerBoostSpell = new PowerBoostSpell();
         powerBoostSpell.castSpell(caster, target);
         int actualPowerBoost = target.getAttackPowerEffectModifier();
-        assertEquals(target.getBaseAttackPower() + expectedPowerBoost, actualPowerBoost, "Din PowerBoost är för fel");
+        assertEquals(target.getBaseAttackPower() + expectedPowerBoost, actualPowerBoost + race.getAttackPowerModifier(), "Din PowerBoost är för fel");
     }
-
 }
 

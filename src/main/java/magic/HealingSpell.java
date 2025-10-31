@@ -31,18 +31,6 @@ public class HealingSpell implements Magic{
         visitor.visit(this, caster, target);
     }
     @Override
-    public boolean checkIfAbleToCast() {
-        // if(Om race tillåter det, mana cost, environment etc)
-        return true;
-    }
-
-    @Override
-    public int checkEnvironmentBoost() {
-        //Om du är i gräs område -> damage boost
-        //Om du är i vatten område -> damage decrease
-        return 1;
-    }
-    @Override
     public String toString() {
         return toStringDescription();
     }

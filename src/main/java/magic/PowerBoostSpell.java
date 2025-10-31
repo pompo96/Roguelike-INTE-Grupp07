@@ -24,10 +24,4 @@ public class PowerBoostSpell implements Magic {
     public void accept(SpellVisitor visitor, Player caster, Player target){
         visitor.visit(this, caster, target);
     }
-    public boolean checkIfAbleToCast(){
-        return true;
-    }
-    public int checkEnvironmentBoost(){
-        return 1;
-    }
 }
