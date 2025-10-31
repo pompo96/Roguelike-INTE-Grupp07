@@ -122,7 +122,6 @@ public class AiTest {
         defaultAi.update();
         Position afterPatrol = defaultAi.getMob().getCurrentPosition();
         assertEquals(customDestination, afterPatrol);
-
     }
 
     @Test
