@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    100%
   </span>
   <span class="absValue">
-    (5/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.5%
+    100%
   </span>
   <span class="absValue">
-    (8/13)
+    (13/13)
   </span>
 </td>
 </tr>
@@ -105,12 +105,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public boolean purchaseItem(int itemID, Player player) {
-<b class="nc">&nbsp;        if (!stock.containsKey(itemID)) {return false;}</b>
+<b class="fc">&nbsp;        if (!stock.containsKey(itemID)) {return false;}</b>
 &nbsp;
-<b class="nc">&nbsp;        Item item = stock.remove(itemID);</b>
-<b class="nc">&nbsp;        prices.remove(itemID);</b>
-<b class="nc">&nbsp;        player.addToInventory(item);</b>
-<b class="nc">&nbsp;        return true;</b>
+<b class="fc">&nbsp;        Item item = stock.remove(itemID);</b>
+<b class="fc">&nbsp;        prices.remove(itemID);</b>
+<b class="fc">&nbsp;        player.addToInventory(item);</b>
+<b class="fc">&nbsp;        return true;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public boolean hasItem(int itemID) {
@@ -150,7 +150,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2025-10-31 06:02</div>
+    <div style="float:right;">generated on 2025-10-31 06:40</div>
 </div>
 </body>
 </html>
