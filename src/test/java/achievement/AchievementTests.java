@@ -108,4 +108,23 @@ public class AchievementTests {
     public void getAchievementWithInvalidIdShouldReturnNull(){
         assertNull(manager.getAchievement("invalid_id"));
     }
+
+    //fick inte full täckning på isUnlocked()-metoden då jag hade missat ett test som kollar
+    //testar ett ogiltigt id som därav gör att achievement == null. Jag hade endast test som
+    //kollade vad som hände när ett achievement redan var unlocked, och därav även != null.
+    @Test
+    public void isUnlockedWithInvalidIdReturnsFalse(){
+        assertFalse(manager.isUnlocked("invalid_id"));
+    }
+
+    //ännu en metod (unlockAchievement()) som inte hade full branch-covarage, endast 3/4
+    //Även detta pga att ett ogiltigt Id aldrig testades, utan metoden testades med giltiga id:n,
+    //där achievements antingen redan va unlocked och inte gick att låsa upp eller att det var en
+    //spell som inte var någon achievement att använda
+    @Test
+    public void unlockAchievementWithInvalidIdDoesNothing(){
+        int pointsBefore = manager.getTotalPoints();
+        manager.unlockAchievement("invalid_id");
+        assertEquals(pointsBefore, manager.getTotalPoints());
+    }
 }

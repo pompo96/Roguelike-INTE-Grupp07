@@ -11,10 +11,10 @@ public class Human extends AbstractRace{
     @Override
     public int getSpellModifier(Magic spell){
         if (spell instanceof FireSpell){return 0;}
-        if (spell instanceof IceSpell){return 0;}
-        if (spell instanceof ElectricSpell){return 0;}
-        if (spell instanceof HealingSpell){return 5;}
-        if (spell instanceof PowerBoostSpell){return 0;}
+        else if (spell instanceof IceSpell){return 0;}
+        else if (spell instanceof ElectricSpell){return 0;}
+        else if (spell instanceof HealingSpell){return 5;}
+        else if (spell instanceof PowerBoostSpell){return 0;}
         return 0;
     }
 
