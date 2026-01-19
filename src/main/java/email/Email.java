@@ -17,4 +17,14 @@ public class Email {
     }
 
 
+    //Metod som gör alla bokstäver små så det går att jämföra emails oavsett om de har
+    //stora eller små bokstäver.
+    private static String normalize(String adress){
+        if(adress == null){
+            return null;
+        }
+        return adress.trim().toLowerCase();
+    }
+
+
 }
