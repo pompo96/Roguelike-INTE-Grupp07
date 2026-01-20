@@ -41,6 +41,10 @@ public class Email {
 
     }
 
+    public boolean isRegistered(){
+        return registered;
+    }
+
     //Kollar om en email har en valid adress
     public boolean isValid(){
 
