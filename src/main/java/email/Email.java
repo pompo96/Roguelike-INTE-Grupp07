@@ -45,10 +45,6 @@ public class Email {
         return registered;
     }
 
-    public boolean registered(){
-
-    }
-
     //Kollar om en email har en valid adress
     public boolean isValid(){
         if(rawAdress == null || rawAdress.isBlank()){
@@ -65,12 +61,11 @@ public class Email {
                 && !email.contains("..");
     }
 
-    public boolean isEmailTaken(String adress){
+    public static boolean isEmailTaken(String adress){
         if(adress == null || adress.isEmpty()){
             return false;
         }
         return allEmails.contains(normalize(adress));
     }
-
 
 }
