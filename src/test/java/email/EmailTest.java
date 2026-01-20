@@ -60,11 +60,11 @@ public class EmailTest {
             " firstname@example.com , firstname@example.com"
     })
     @DisplayName("Emails are standarlized/normalized before registration")
-    void emailIsStandarlized(String adress, String standarlized){
+    void emailIsNormalized(String adress, String normalized){
         Email email = new Email(adress);
         email.register();
 
-        assertTrue(Email.isEmailTaken(standarlized));
+        assertTrue(Email.isEmailTaken(normalized));
     }
 
     @ParameterizedTest

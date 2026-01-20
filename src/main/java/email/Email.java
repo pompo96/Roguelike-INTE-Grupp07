@@ -7,12 +7,12 @@ public class Email {
 
     private static final Set<String> allEmails = new HashSet<>();
 
-    private String rawAdress;
-    private String normalizedAdress;
+    private final String originalAdress;
+    private final String normalizedAdress;
     private boolean registered = false;
 
     public Email(String adress){
-        this.rawAdress = adress;
+        this.originalAdress = adress;
         this.normalizedAdress = normalize(adress);
     }
 
@@ -47,7 +47,7 @@ public class Email {
 
     //Kollar om en email har en valid adress
     public boolean isValid(){
-        if(rawAdress == null || rawAdress.isBlank()){
+        if(originalAdress == null || originalAdress.isBlank()){
             return false;
         }
         String email = normalizedAdress;
