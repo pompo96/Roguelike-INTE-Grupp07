@@ -16,7 +16,6 @@ public class Email {
         this.normalizedAdress = normalize(adress);
     }
 
-
     //Metod som gör alla bokstäver små så det går att jämföra emails oavsett om de har
     //stora eller små bokstäver.
     private static String normalize(String adress){
@@ -24,6 +23,31 @@ public class Email {
             return null;
         }
         return adress.trim().toLowerCase();
+    }
+
+    //Registrera mails som är valida och som inte redan finns i registret sen tidigare
+    public boolean register(){
+        if(!isValid()){
+            return false;
+        }
+
+        if(isEmailTaken(normalizedAdress)){
+            return false;
+        }
+
+        allEmails.add(normalizedAdress);
+        registered = true;
+        return true;
+
+    }
+
+    //Kollar om en email har en valid adress
+    public boolean isValid(){
+
+    }
+
+    public boolean isEmailTaken(String adress){
+
     }
 
 
