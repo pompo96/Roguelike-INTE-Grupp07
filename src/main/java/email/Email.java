@@ -45,9 +45,24 @@ public class Email {
         return registered;
     }
 
+    public boolean registered(){
+
+    }
+
     //Kollar om en email har en valid adress
     public boolean isValid(){
+        if(rawAdress == null || rawAdress.isBlank()){
+            return false;
+        }
+        String email = normalizedAdress;
 
+        //regler för vad email ska innehålla
+        return email.contains("@")
+                && email.contains(".")
+                && !email.startsWith("@")
+                && !email.endsWith("@")
+                && !email.contains(" ")
+                && !email.contains("..");
     }
 
     public boolean isEmailTaken(String adress){
