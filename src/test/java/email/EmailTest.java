@@ -25,10 +25,10 @@ public class EmailTest {
             "first_middle+last@example.com",
             "first19@example.com"
     })
-    void validEmailFormatAreCorrect(String adress){
-        Email email = new Email(adress);
+    void validEmailFormatAreCorrect(String address){
+        Email email = new Email(address);
 
-        assertTrue(email.isValid(), "Expected valid email: " + adress);
+        assertTrue(email.isValid(), "Expected valid email: " + address);
     }
 
     //Invalida email format
@@ -44,8 +44,8 @@ public class EmailTest {
             "first name@example.com",
             "player@example..com"
     })
-    void invalidEmailFormatAreIncorrect(String adress){
-        Email email = new Email(adress);
+    void invalidEmailFormatAreIncorrect(String address){
+        Email email = new Email(address);
 
         assertFalse(email.isValid(), "Expected invalid email: " + email);
         assertFalse(email.isRegistered());
@@ -60,8 +60,8 @@ public class EmailTest {
             " firstname@example.com , firstname@example.com"
     })
     @DisplayName("Emails are standarlized/normalized before registration")
-    void emailIsNormalized(String adress, String normalized){
-        Email email = new Email(adress);
+    void emailIsNormalized(String address, String normalized){
+        Email email = new Email(address);
         email.register();
 
         assertTrue(Email.isEmailTaken(normalized));
@@ -73,9 +73,9 @@ public class EmailTest {
             "Firstname@Example.com, firstname@example.com"
     })
     @DisplayName("Emails differing only by case are considered the same")
-    void emailValidationIsCaseInsensitive(String firstAdress, String secondAdress){
-        Email emailOne = new Email(firstAdress);
-        Email emailTwo = new Email(secondAdress);
+    void emailValidationIsCaseInsensitive(String firstAddress, String secondAddress){
+        Email emailOne = new Email(firstAddress);
+        Email emailTwo = new Email(secondAddress);
 
         assertTrue(emailOne.register());
         assertFalse(emailTwo.register());
@@ -140,8 +140,8 @@ public class EmailTest {
     @NullAndEmptySource
     @ValueSource(strings ={"unknown@example.com"})
     @DisplayName("isEmailValid handles unknown and null inputs safely")
-    void isEmailTakenHandlesUnknownAndNullInputs(String adress){
-        assertFalse(Email.isEmailTaken(adress));
+    void isEmailTakenHandlesUnknownAndNullInputs(String address){
+        assertFalse(Email.isEmailTaken(address));
     }
 
 }
