@@ -68,7 +68,7 @@ public class Email {
         return allEmails.contains(normalize(adress));
     }
 
-    public static void clearRegistery(){
+    public static void clearRegistry(){
         allEmails.clear();
     }
 
