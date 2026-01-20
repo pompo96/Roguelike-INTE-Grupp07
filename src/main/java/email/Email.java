@@ -47,7 +47,10 @@ public class Email {
     }
 
     public boolean isEmailTaken(String adress){
-
+        if(adress == null || adress.isEmpty()){
+            return false;
+        }
+        return allEmails.contains(normalize(adress));
     }
 
 
