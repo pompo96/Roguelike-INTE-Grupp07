@@ -118,10 +118,10 @@ public class EmailTest {
 
             //räknar hur många mailadresser som blir registrerade
             int registeredCount = 0;
-            if(emailOne.registered()){
+            if(emailOne.isRegistered()){
                 registeredCount++;
             }
-            if(EmailTwo.registered()){
+            if(emailTwo.isRegistered()){
                 registeredCount++;
             }
 
