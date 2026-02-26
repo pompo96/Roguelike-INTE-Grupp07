@@ -113,15 +113,19 @@ public class EmailTest {
 
         //för varje firstEmail så loopas alla secondEmail för att kontrollera alla 16 olika kombinationer av par
         for(String secondEmail : allEmails){
+            Email.clearRegistry();
             Email emailOne = new Email(firstEmail);
             Email emailTwo = new Email(secondEmail);
 
+            boolean firstRegistered = emailOne.register();
+            boolean secondRegistered = emailTwo.register();
+
             //räknar hur många mailadresser som blir registrerade
             int registeredCount = 0;
-            if(emailOne.isRegistered()){
+            if(firstRegistered){
                 registeredCount++;
             }
-            if(emailTwo.isRegistered()){
+            if(secondRegistered){
                 registeredCount++;
             }
 
