@@ -91,7 +91,7 @@ public class EmailTest {
 
         Email validEmail = new Email("valid@email.com");
         assertTrue(validEmail.register());
-        assertTrue(validEmail.isEmailTaken("valid@email.com"));
+        assertTrue(Email.isEmailTaken("valid@email.com"));
     }
 
     //Test som kollar att samma mail inte kan registreras två gånger
