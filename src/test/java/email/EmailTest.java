@@ -47,7 +47,7 @@ public class EmailTest {
     void invalidEmailFormatAreIncorrect(String address){
         Email email = new Email(address);
 
-        assertFalse(email.isValid(), "Expected invalid email: " + email);
+        assertFalse(email.isValid(), "Expected invalid email: " + address);
         assertFalse(email.isRegistered());
     }
 
@@ -130,11 +130,14 @@ public class EmailTest {
             }
 
             //om båda mailadresserna är samma (case-insensitivity) eller båda är ogiltiga kan som högst 1 registreras
-            if(firstEmail.equalsIgnoreCase(secondEmail) || !emailOne.isValid() && !emailTwo.isValid()){
+            if(firstEmail.equalsIgnoreCase(secondEmail) || (!emailOne.isValid() && !emailTwo.isValid())){
                 assertTrue(registeredCount <= 1);
                 //om båda är giltiga och unika så registrras 2
             } else if(emailOne.isValid() && emailTwo.isValid() && !firstEmail.equalsIgnoreCase(secondEmail)){
                 assertEquals(2, registeredCount);
+                //om en är giltig och en ogiltig så registreras 1
+            } else if((emailOne.isValid() && !emailTwo.isValid()) || (!emailOne.isValid() && emailTwo.isValid())){
+                assertEquals(1, registeredCount);
             }
         }
     }
