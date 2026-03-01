@@ -7,12 +7,10 @@ public class Email {
 
     private static final Set<String> allEmails = new HashSet<>();
 
-    private final String originalAddress;
     private final String normalizedAddress;
     private boolean registered = false;
 
     public Email(String address){
-        this.originalAddress = address;
         this.normalizedAddress = normalize(address);
     }
 
@@ -47,18 +45,15 @@ public class Email {
 
     //Kollar om en email har en valid adress
     public boolean isValid(){
-        if(originalAddress == null || originalAddress.isBlank()){
+
+        if(normalizedAddress==null || normalizedAddress.isBlank()){
             return false;
         }
-        String email = normalizedAddress;
 
-        //regler för vad email ska innehålla
-        return email.contains("@")
-                && email.contains(".")
-                && !email.startsWith("@")
-                && !email.endsWith("@")
-                && !email.contains(" ")
-                && !email.contains("..");
+        String email = normalizedAddress;
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}$";
+
+        return email.matches(regex) && !email.contains("..");
     }
 
     public static boolean isEmailTaken(String address){
