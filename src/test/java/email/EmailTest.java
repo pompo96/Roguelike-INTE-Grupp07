@@ -161,4 +161,14 @@ public class EmailTest {
         assertFalse(email.isRegistered());
         assertFalse(email.register());
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " "})
+    @DisplayName("Blank email is invalid")
+    void blankEmailIsInvalid(String address){
+        Email email = new Email(address);
+
+        assertFalse(email.isValid());
+        assertFalse(email.register());
+    }
 }
