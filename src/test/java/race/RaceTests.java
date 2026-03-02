@@ -3,6 +3,7 @@ package race;
 import magic.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class RaceTests {
 
@@ -112,6 +113,31 @@ public class RaceTests {
         Magic iceSpell = new IceSpell();
         assertTrue(human.canCastSpell(iceSpell));
     }
+
+    //Hade endast 87% line coverage på elf, dwarf och human
+    //detta pågrund av att metoden getSpellModifier() inte testade fallet då en okänd
+    //eller ogilltig spell används
+    @Test
+    public void dwarfSpellModifierWithUnknownSpell(){
+        Race dwarf = new Dwarf();
+        Magic unknownSpell = mock(Magic.class);
+        assertEquals(0, dwarf.getSpellModifier(unknownSpell));
+    }
+
+    @Test
+    public void elfSpellModifierWithUnknownSpell(){
+        Race elf = new Elf();
+        Magic unknownSpell = mock(Magic.class);
+        assertEquals(0, elf.getSpellModifier(unknownSpell));
+    }
+
+    @Test
+    public void humanSpellModifierWithUnknownSpell(){
+        Race human = new Human();
+        Magic unknownSpell = mock(Magic.class);
+        assertEquals(0, human.getSpellModifier(unknownSpell));
+    }
+
 
     //test som kollar att rätt ras har/startar med rätt koordinater ex "elfStartsIn..."
 
