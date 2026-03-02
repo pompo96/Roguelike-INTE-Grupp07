@@ -151,4 +151,14 @@ public class EmailTest {
         assertFalse(Email.isEmailTaken(address));
     }
 
+    //test för att att en mail med null värden är invalid
+    @Test
+    @DisplayName("Null address is invalid and cannot be registered")
+    void nullEmailIsInvalid(){
+        Email email = new Email(null);
+
+        assertFalse(email.isValid());
+        assertFalse(email.isRegistered());
+        assertFalse(email.register());
+    }
 }
